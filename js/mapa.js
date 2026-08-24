@@ -363,15 +363,19 @@ const btnToggleProps = document.getElementById("btnToggleProps");
 const leftPanelElem = document.querySelector(".left-panel");
 const rightPanelElem = document.querySelector(".right-panel");
 
-if (btnToggleTools && btnToggleProps && leftPanelElem && rightPanelElem) {
+  if (btnToggleTools && btnToggleProps && leftPanelElem && rightPanelElem) {
   btnToggleTools.onclick = () => {
     leftPanelElem.classList.toggle("open");
     rightPanelElem.classList.remove("open");
+    btnToggleTools.classList.toggle("active-panel", leftPanelElem.classList.contains("open"));
+    btnToggleProps.classList.remove("active-panel");
   };
 
   btnToggleProps.onclick = () => {
     rightPanelElem.classList.toggle("open");
     leftPanelElem.classList.remove("open");
+    btnToggleProps.classList.toggle("active-panel", rightPanelElem.classList.contains("open"));
+    btnToggleTools.classList.remove("active-panel");
   };
 }
 
