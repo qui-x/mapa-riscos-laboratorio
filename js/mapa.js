@@ -357,6 +357,34 @@ if (canvasEl) {
     }
   });
 }
+  // --- CONTROLES DOS PAINÉIS MOBILE ---
+const btnToggleTools = document.getElementById("btnToggleTools");
+const btnToggleProps = document.getElementById("btnToggleProps");
+const leftPanelElem = document.querySelector(".left-panel");
+const rightPanelElem = document.querySelector(".right-panel");
+
+if (btnToggleTools && btnToggleProps && leftPanelElem && rightPanelElem) {
+  btnToggleTools.onclick = () => {
+    leftPanelElem.classList.toggle("open");
+    rightPanelElem.classList.remove("open");
+  };
+
+  btnToggleProps.onclick = () => {
+    rightPanelElem.classList.toggle("open");
+    leftPanelElem.classList.remove("open");
+  };
+}
+
+// Fecha os painéis ao tocar/clicar no canvas em telas pequenas
+const canvasEl = document.getElementById("canvas");
+if (canvasEl) {
+  canvasEl.addEventListener("pointerdown", () => {
+    if (window.innerWidth <= 760) {
+      if (leftPanelElem) leftPanelElem.classList.remove("open");
+      if (rightPanelElem) rightPanelElem.classList.remove("open");
+    }
+  });
+}
 function updateUI(){
   const o=state.selected;
   $("title").textContent=o?(TYPES[o.type]?.[0]||o.type):"Nenhum elemento";
