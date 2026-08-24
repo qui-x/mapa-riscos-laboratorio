@@ -494,54 +494,67 @@ IDENTIFICADORES DE RISCOS
 .check.ok span{
   background:#7d9d91
 }
-/* =====================================================================
-   AJUSTES FINAIS DE RESPONSIVIDADE PARA O EDITOR DE MAPA E BARRA DE TOPO
-   ===================================================================== */
+
+/*---------------------------------
+    RESPONSIVIDADE MOBILE (<= 760px)
+------------------------------------*/
+.mobile-only {
+  display: none !important;
+}
 
 @media (max-width: 760px) {
-  /* Ajusta o comportamento dos botões e grupos na barra superior no mobile */
-  header.top {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .top-right-group {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .brand {
-    justify-content: flex-start;
-  }
-
-  /* Garante que os botões de controle mobile apareçam corretamente */
+  /* Exibe os botões mobile que serão criados no topo */
   .mobile-only {
     display: inline-flex !important;
   }
 
-  /* Workspace adaptado para tela única com painéis em gaveta */
+  /* Ajusta o cabeçalho para empilhar os elementos sem quebrar */
+  header.topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+
+  .topbar .brand {
+    justify-content: flex-start;
+  }
+
+  .topbar .stepper {
+    display: none; /* Oculta o passo a passo no celular para economizar espaço */
+  }
+
+  .top-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  /* Transforma o workspace em uma única coluna focada no canvas */
   .workspace {
     grid-template-columns: 1fr;
     position: relative;
     overflow: hidden;
-    height: calc(100dvh - 140px); /* Usa altura dinâmica moderna com fallback */
-    height: calc(100vh - 140px);
+    height: calc(100dvh - 120px);
+    height: calc(100vh - 120px);
   }
 
-  /* Painéis laterais transformados em gavetas flutuantes */
+  /* Transforma os painéis esquerdo e direito em gavetas flutuantes */
   .left-panel, .right-panel {
     position: absolute;
     top: 0;
     bottom: 0;
     width: 280px;
     max-width: 85vw;
-    z-index: 50;
+    z-index: 100;
     transition: transform 0.3s ease;
     box-shadow: 0 0 25px rgba(0,0,0,0.8);
     display: block !important;
-    background: var(--surface);
+    background: var(--surface, #161D2E);
+    overflow-y: auto;
+    padding: 16px;
   }
 
   .left-panel {
@@ -554,7 +567,7 @@ IDENTIFICADORES DE RISCOS
     transform: translateX(120%);
   }
 
-  /* Classes ativas injetadas pelo JS para abrir as gavetas */
+  /* Classes ativadas pelo JavaScript para abrir as gavetas */
   .left-panel.open {
     transform: translateX(0);
   }
@@ -563,12 +576,16 @@ IDENTIFICADORES DE RISCOS
     transform: translateX(0);
   }
 
-  /* Reposiciona a barra de ferramentas do canvas para não tapar o rodapé */
+  /* Reposiciona a barra de ferramentas flutuante do canvas no rodapé */
   .canvas-toolbar {
     top: auto;
-    bottom: 15px;
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
+    width: 90%;
+    max-width: 340px;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .canvas-help {
