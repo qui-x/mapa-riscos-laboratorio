@@ -323,7 +323,40 @@ $("applyProps").onclick=()=>{
   if(Object.values(vals).some(v=>!Number.isFinite(v)))return;
   pushHistory();Object.assign(state.selected,vals);normalizeObject(state.selected);updateUI();draw();
 };
+// --- CONTROLES DOS PAINÉIS MOBILE ---
+const topActionsBar = document.querySelector(".topbar .top-actions");
+const leftPanelElem = document.querySelector(".left-panel");
+const rightPanelElem = document.querySelector(".right-panel");
 
+if (topActionsBar && !document.getElementById("btnToggleTools")) {
+  // Injeta os botões "Ferramentas" e "Propriedades" na barra de topo no mobile
+  const mobileNavHTML = `
+    <button id="btnToggleTools" class="mobile-only" title="Ferramentas">Ferramentas</button>
+    <button id="btnToggleProps" class="mobile-only" title="Propriedades">Propriedades</button>
+  `;
+  topActionsBar.insertAdjacentHTML("afterbegin", mobileNavHTML);
+
+  document.getElementById("btnToggleTools").onclick = () => {
+    leftPanelElem.classList.toggle("open");
+    rightPanelElem.classList.remove("open");
+  };
+  
+  document.getElementById("btnToggleProps").onclick = () => {
+    rightPanelElem.classList.toggle("open");
+    leftPanelElem.classList.remove("open");
+  };
+}
+
+// Fecha as gavetas automaticamente ao clicar no canvas no modo mobile
+const canvasEl = document.getElementById("canvas");
+if (canvasEl) {
+  canvasEl.addEventListener("pointerdown", () => {
+    if (window.innerWidth <= 760) {
+      leftPanelElem.classList.remove("open");
+      rightPanelElem.classList.remove("open");
+    }
+  });
+}
 function updateUI(){
   const o=state.selected;
   $("title").textContent=o?(TYPES[o.type]?.[0]||o.type):"Nenhum elemento";
