@@ -33,6 +33,8 @@ const TYPES = {
 const RISK_TYPES = ["chemical","biological","physical","fire","electrical","ergonomic","radiation","slip"];
 const RISK_COLORS = {chemical:"#c8a16d",biological:"#8fb09a",physical:"#a9a0bf",fire:"#c8836f",electrical:"#d2b36e",ergonomic:"#9da8b5",radiation:"#b79cbd",slip:"#93aebc"};
 
+const EQUIPMENT_TYPES = ["shower", "eyewash", "extinguisher"];
+
 const CATEGORIES = {
   estrutura: {
     label: "Estrutura & Acessos",
@@ -48,7 +50,7 @@ const CATEGORIES = {
   },
   seguranca: {
     label: "Segurança de Emergência",
-    types: ["shower", "eyewash", "extinguisher"]
+    types: EQUIPMENT_TYPES
   },
   riscos: {
     label: "Sinalização de Riscos",
@@ -64,6 +66,22 @@ const state = {
   history:[],future:[],
   objects:[]
 };
+
+const riskImages = {};
+RISK_TYPES.forEach(type => {
+  const img = new Image();
+  img.src = `assets/svg/risk-${type}.svg`;
+  img.onload = () => { draw(); };
+  riskImages[type] = img;
+});
+
+const equipmentImages = {};
+EQUIPMENT_TYPES.forEach(type => {
+  const img = new Image();
+  img.src = `assets/svg/equipment-${type}.svg`;
+  img.onload = () => { draw(); };
+  equipmentImages[type] = img;
+});
 
 const $ = id => document.getElementById(id);
 const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
@@ -215,6 +233,8 @@ function drawObject(o){
 
   if(RISK_TYPES.includes(o.type)){
     drawRisk(o.type,w,h);
+  } else if(EQUIPMENT_TYPES.includes(o.type)){
+    drawEquipment(o.type,w,h);
   } else if(o.type==="wall"){
     ctx.fillStyle="#e2e8f0";ctx.fillRect(0,0,w,h);
     ctx.strokeStyle="#475569";ctx.lineWidth=1.5;ctx.strokeRect(0,0,w,h);
@@ -226,7 +246,7 @@ function drawObject(o){
     ctx.fillStyle="#94a3b8";ctx.fillRect(0,0,w,Math.max(3,t*0.15));ctx.fillRect(0,0,Math.max(3,t*0.15),h);
     ctx.strokeStyle="#475569";ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(t,t);ctx.lineTo(w,t);ctx.moveTo(t,t);ctx.lineTo(t,h);ctx.stroke();
-  }else if(o.type==="door"){
+  } else if(o.type==="door"){
     ctx.fillStyle="#1b2329";
     ctx.fillRect(0,0,w,h);
     ctx.strokeStyle="#94a3b8";
@@ -283,16 +303,6 @@ function drawObject(o){
   } else if(o.type==="zone"){
     ctx.fillStyle="rgba(56, 189, 248, 0.08)";ctx.fillRect(0,0,w,h);
     ctx.setLineDash([6,4]);ctx.strokeStyle="#38bdf8";ctx.lineWidth=1.5;ctx.strokeRect(0,0,w,h);ctx.setLineDash([]);
-  } else if(o.type==="extinguisher"){
-    ctx.fillStyle="#ef4444";ctx.beginPath();ctx.arc(w/2,h/2,Math.min(w,h)*0.45,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle="#991b1b";ctx.lineWidth=2;ctx.stroke();
-    ctx.fillStyle="#ffffff";ctx.font=`bold ${Math.max(8,w*0.32)}px Arial`;ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillText("EXT",w/2,h/2);
-  } else if(o.type==="shower"||o.type==="eyewash"){
-    ctx.fillStyle="#0ea5e9";ctx.beginPath();ctx.arc(w/2,h/2,Math.min(w,h)*0.42,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle="#0369a1";ctx.lineWidth=2;ctx.stroke();
-    ctx.fillStyle="#ffffff";ctx.font=`bold ${Math.max(8,w*0.32)}px Arial`;ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillText(o.type==="shower"?"DU":"LO",w/2,h/2);
   } else if(o.type==="exit"){
     ctx.fillStyle="#22c55e";ctx.fillRect(0,0,w,h);
     ctx.strokeStyle="#14532d";ctx.lineWidth=1.5;ctx.strokeRect(0,0,w,h);
@@ -308,15 +318,54 @@ function drawBench(w,h){
   ctx.fillStyle="#334155";ctx.fillRect(w*0.04,h*0.2,w*0.92,h*0.72);
 }
 
-function drawRisk(type,w,h){
-  const c=RISK_COLORS[type]||"#aebbc2";
-  const r=Math.min(w,h)*0.38;
-  ctx.fillStyle=c+"33";ctx.strokeStyle=c;ctx.lineWidth=2;
-  ctx.beginPath();ctx.arc(w/2,h/2,r,0,Math.PI*2);ctx.fill();ctx.stroke();
-  ctx.fillStyle=c;ctx.font=`bold ${Math.max(10,Math.min(w,h)*0.36)}px Arial`;ctx.textAlign="center";ctx.textBaseline="middle";
-  const symbol={chemical:"Q",biological:"B",physical:"F",fire:"I",electrical:"E",ergonomic:"G",radiation:"R",slip:"C"}[type]||"?";
-  ctx.fillText(symbol,w/2,h/2);
-  ctx.textAlign="left";ctx.textBaseline="alphabetic";
+function drawRisk(type, w, h){
+  const img = riskImages[type];
+  if (img && img.complete && img.naturalHeight !== 0) {
+    ctx.drawImage(img, 0, 0, w, h);
+  } else {
+    const c = RISK_COLORS[type] || "#aebbc2";
+    const r = Math.min(w, h) * 0.38;
+    ctx.fillStyle = c + "33"; 
+    ctx.strokeStyle = c; 
+    ctx.lineWidth = 2;
+    ctx.beginPath(); 
+    ctx.arc(w / 2, h / 2, r, 0, Math.PI * 2); 
+    ctx.fill(); 
+    ctx.stroke();
+    
+    ctx.fillStyle = c;
+    ctx.font = `bold ${Math.max(10, Math.min(w, h) * 0.36)}px Arial`;
+    ctx.textAlign = "center"; 
+    ctx.textBaseline = "middle";
+    const symbol = {chemical:"Q", biological:"B", physical:"F", fire:"I", electrical:"E", ergonomic:"G", radiation:"R", slip:"C"}[type] || "?";
+    ctx.fillText(symbol, w / 2, h / 2);
+    ctx.textAlign = "left"; 
+    ctx.textBaseline = "alphabetic";
+  }
+}
+
+function drawEquipment(type, w, h){
+  const img = equipmentImages[type];
+  if (img && img.complete && img.naturalHeight !== 0) {
+    ctx.drawImage(img, 0, 0, w, h);
+  } else {
+    const c = type === "extinguisher" ? "#ef4444" : "#0ea5e9";
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.arc(w / 2, h / 2, Math.min(w, h) * 0.42, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = type === "extinguisher" ? "#991b1b" : "#0369a1";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `bold ${Math.max(8, w * 0.32)}px Arial`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const text = type === "extinguisher" ? "EXT" : (type === "shower" ? "DU" : "LO");
+    ctx.fillText(text, w / 2, h / 2);
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+  }
 }
 
 function drawSelection(o){
@@ -389,7 +438,7 @@ canvas.addEventListener("wheel",e=>{
 
 document.querySelectorAll("#palette button").forEach(b=>b.addEventListener("click",()=>{
   const type=b.dataset.type;
-  if(type==="wall"||type==="door"||type==="window"||type==="bench"||type==="benchL"||type==="sink"||type==="hood"||type==="cabinet"||type==="shelf"||type==="equipment"||type==="zone"||RISK_TYPES.includes(type)||(TYPES[type]&&type!=="select"&&type!=="pan")){
+  if(type==="wall"||type==="door"||type==="window"||type==="bench"||type==="benchL"||type==="sink"||type==="hood"||type==="cabinet"||type==="shelf"||type==="equipment"||type==="zone"||RISK_TYPES.includes(type)||EQUIPMENT_TYPES.includes(type)||(TYPES[type]&&type!=="select"&&type!=="pan")){
     addObject(type,state.room.w/2,state.room.h/2);
   }
   canvas.focus();
@@ -406,7 +455,6 @@ $("fitRoom").onclick=fitRoom;
 $("applyRoom").onclick=applyRoom;
 $("undo").onclick=undo;$("redo").onclick=redo;
 
-// Ação do Botão de Voltar na barra lateral
 const btnBack = $("btnBack");
 if(btnBack){
   btnBack.onclick = () => {
@@ -523,7 +571,6 @@ function updateUI(){
   $("title").textContent=o?(TYPES[o.type]?.[0]||o.type):"Visão Geral do Mapa";
   $("sub").textContent=o?"Edite posição, tamanho e rotação.":"Lista de elementos posicionados por categoria.";
   
-  // Alterna visibilidade do botão de voltar
   if(btnBack) btnBack.classList.toggle("hidden", !o);
 
   $("emptyProps").classList.toggle("hidden",!!o);
@@ -576,17 +623,6 @@ if (exportSvgBtn) {
     let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgW} ${svgH}" width="100%" height="100%">`;
     svgContent += `<rect width="${svgW}" height="${svgH}" fill="#c6ccd0" stroke="#f1f3f4" stroke-width="8"/>`;
 
-    const riskSymbols = {
-      chemical: "Q",
-      biological: "B",
-      physical: "F",
-      fire: "I",
-      electrical: "E",
-      ergonomic: "G",
-      radiation: "R",
-      slip: "C"
-    };
-
     state.objects.forEach(o => {
       const ox = o.x * scale;
       const oy = o.y * scale;
@@ -599,13 +635,9 @@ if (exportSvgBtn) {
       svgContent += `<g transform="translate(${cx}, ${cy}) rotate(${rot}) translate(${-ow / 2}, ${-oh / 2})">`;
 
       if (RISK_TYPES.includes(o.type)) {
-        const color = RISK_COLORS[o.type] || "#aebbc2";
-        const r = Math.min(ow, oh) * 0.36;
-        const symbol = riskSymbols[o.type] || "?";
-        const fontSize = Math.max(10, Math.min(ow, oh) * 0.34);
-
-        svgContent += `<circle cx="${ow/2}" cy="${oh/2}" r="${r}" fill="${color}33" stroke="${color}" stroke-width="2"/>`;
-        svgContent += `<text x="${ow/2}" y="${oh/2}" font-family="Arial" font-size="${fontSize}" font-weight="bold" fill="${color}" text-anchor="middle" dominant-baseline="central">${symbol}</text>`;
+        svgContent += `<image href="assets/svg/risk-${o.type}.svg" x="0" y="0" width="${ow}" height="${oh}" preserveAspectRatio="xMidYMid meet"/>`;
+      } else if (EQUIPMENT_TYPES.includes(o.type)) {
+        svgContent += `<image href="assets/svg/equipment-${o.type}.svg" x="0" y="0" width="${ow}" height="${oh}" preserveAspectRatio="xMidYMid meet"/>`;
       } else if (o.type === "door") {
         svgContent += `<rect width="${ow}" height="${oh}" fill="#ddd" stroke="#c5a46d" stroke-width="3"/>`;
       } else if (o.type === "window") {
