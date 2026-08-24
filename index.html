@@ -172,10 +172,9 @@
         <div class="canvas-help">Clique para adicionar · arraste para mover · Shift + arraste para pan · roda para zoom</div>
       </section>
 
-      <!-- PAINEL DIREITO: PROPRIEDADES, RESUMO E VERIFICAÇÃO -->
+      <!-- PAINEL DIREITO: PROPRIEDADES E VERIFICAÇÃO -->
       <aside class="right-panel">
         <div class="selection-head">
-          <!-- Botão de voltar integrado no topo -->
           <button id="btnBack" class="btn-back hidden">← Voltar para a lista</button>
           <span class="eyebrow">PROPRIEDADES</span>
           <h2 id="title">Nenhum elemento</h2>
@@ -214,21 +213,27 @@
             <button id="duplicate">Duplicar</button>
           </div>
           <button class="danger full" id="delete">Excluir elemento</button>
-        </div>  
+        </div>
 
         <div class="risk-summary">
           <div class="section-title">Resumo de riscos</div>
           <div id="riskList" class="risk-list"></div>
         </div>
 
+        <!-- MENU DE VERIFICAÇÃO DA PLANTA ATUALIZADO (7 CRITÉRIOS NORMATIVOS) -->
         <div class="map-check">
-          <div class="section-title">Verificação da planta</div>
-          <div class="check" id="c1"><span></span>Dimensões definidas</div>
-          <div class="check" id="c2"><span></span>Acesso / saída</div>
-          <div class="check" id="c3"><span></span>Área de trabalho</div>
-          <div class="check" id="c4"><span></span>Circulação</div>
-          <div class="check" id="c5"><span></span>Emergência</div>
-          <div class="check" id="c6"><span></span>Riscos identificados</div>
+          <div class="section-title">
+            <span>Verificação da Planta</span>
+            <span id="compliance-badge" class="badge">0/7</span>
+          </div>
+          <p class="help-text" style="font-size: 0.75rem; color: var(--muted); margin-bottom: 8px;">Conformidade técnica (NRs / ABNT)</p>
+          <div class="check" id="check-dim"><span></span> Dimensões mínimas e área útil</div>
+          <div class="check" id="check-exit"><span></span> Rotas de fuga e saídas (NR-23)</div>
+          <div class="check" id="check-safety"><span></span> Chuveiro / Lava-olhos de emergência (NR-32)</div>
+          <div class="check" id="check-fire"><span></span> Extintor de incêndio (NR-23 / NR-20)</div>
+          <div class="check" id="check-electrical"><span></span> Instalações e equipamentos elétricos (NR-10)</div>
+          <div class="check" id="check-chemical-bio"><span></span> Sinalização de riscos químicos/biológicos (NR-01/09/26)</div>
+          <div class="check" id="check-ventilation"><span></span> Capelas ou ventilação adequada (NR-15 / ABNT)</div>
         </div>
       </aside>
     </main>
