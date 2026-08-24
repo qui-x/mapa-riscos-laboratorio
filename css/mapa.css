@@ -494,38 +494,44 @@ IDENTIFICADORES DE RISCOS
 .check.ok span{
   background:#7d9d91
 }
-/*---------------------------------
-    RESPONSIVIDADE DO PROGRAMA
-------------------------------------*/
-.mobile-only {
-  display: none;
-}
+/* =====================================================================
+   AJUSTES FINAIS DE RESPONSIVIDADE PARA O EDITOR DE MAPA E BARRA DE TOPO
+   ===================================================================== */
 
-@media(max-width:1100px){
-  .workspace{
-    grid-template-columns: 240px 1fr 220px;
+@media (max-width: 760px) {
+  /* Ajusta o comportamento dos botões e grupos na barra superior no mobile */
+  header.top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 20px;
   }
-  .brand{
-    min-width: 230px;
-  }
-  .stepper{
-    display: none;
-  }
-}
 
-@media(max-width:760px){
+  .top-right-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .brand {
+    justify-content: flex-start;
+  }
+
+  /* Garante que os botões de controle mobile apareçam corretamente */
   .mobile-only {
-    display: inline-flex;
+    display: inline-flex !important;
   }
-  
-  .workspace{
+
+  /* Workspace adaptado para tela única com painéis em gaveta */
+  .workspace {
     grid-template-columns: 1fr;
     position: relative;
     overflow: hidden;
+    height: calc(100dvh - 140px); /* Usa altura dinâmica moderna com fallback */
+    height: calc(100vh - 140px);
   }
-  
-  /* Transforma os painéis laterais em gavetas flutuantes */
-  .left-panel, .right-panel{
+
+  /* Painéis laterais transformados em gavetas flutuantes */
+  .left-panel, .right-panel {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -535,35 +541,37 @@ IDENTIFICADORES DE RISCOS
     transition: transform 0.3s ease;
     box-shadow: 0 0 25px rgba(0,0,0,0.8);
     display: block !important;
+    background: var(--surface);
   }
 
-  .left-panel{
+  .left-panel {
     left: 0;
     transform: translateX(-120%);
   }
-  
-  .right-panel{
+
+  .right-panel {
     right: 0;
     transform: translateX(120%);
   }
 
-  /* Classes ativas para abrir as gavetas via JS */
-  .left-panel.open{
-    transform: translateX(0);
-  }
-  
-  .right-panel.open{
+  /* Classes ativas injetadas pelo JS para abrir as gavetas */
+  .left-panel.open {
     transform: translateX(0);
   }
 
-  .canvas-toolbar{
+  .right-panel.open {
+    transform: translateX(0);
+  }
+
+  /* Reposiciona a barra de ferramentas do canvas para não tapar o rodapé */
+  .canvas-toolbar {
     top: auto;
     bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
   }
-  
-  .canvas-help{
+
+  .canvas-help {
     display: none;
   }
 }
