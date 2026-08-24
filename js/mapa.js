@@ -374,9 +374,42 @@ function drawSelection(o){
 }
 
 function drawRulers(){
-  const tl=worldToScreen(0,0);
-  ctx.strokeStyle="#50636d";ctx.fillStyle="#91a1a9";ctx.font="9px Arial";
-  for(let x=0;x<=state.room.w;x++){const p=worldToScreen(x,0);if(x%1===0){ctx.beginPath();ctx.moveTo(p.x,p.y-4);ctx.lineTo(p.x,p.y-10);ctx.stroke();ctx.fillText(String(x),p.x-3,p.y-13);}}
+  const tl = worldToScreen(0,0);
+  ctx.strokeStyle = "#50636d";
+  ctx.fillStyle = "#91a1a9";
+  ctx.font = "9px Arial";
+
+  // Régua Horizontal (Topo)
+  for(let x = 0; x <= state.room.w; x++){
+    const p = worldToScreen(x, 0);
+    if(x % 1 === 0){
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - 4);
+      ctx.lineTo(p.x, p.y - 10);
+      ctx.stroke();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "alphabetic";
+      ctx.fillText(String(x), p.x, p.y - 13);
+    }
+  }
+
+  // Régua Vertical (Esquerda)
+  for(let y = 0; y <= state.room.h; y++){
+    const p = worldToScreen(0, y);
+    if(y % 1 === 0){
+      ctx.beginPath();
+      ctx.moveTo(p.x - 4, p.y);
+      ctx.lineTo(p.x - 10, p.y);
+      ctx.stroke();
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      ctx.fillText(String(y), p.x - 13, p.y);
+    }
+  }
+  
+  // Reseta alinhamento de texto padrão
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
 }
 
 function setMode(tool){
