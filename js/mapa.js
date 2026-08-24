@@ -33,6 +33,29 @@ const TYPES = {
 const RISK_TYPES = ["chemical","biological","physical","fire","electrical","ergonomic","radiation","slip"];
 const RISK_COLORS = {chemical:"#c8a16d",biological:"#8fb09a",physical:"#a9a0bf",fire:"#c8836f",electrical:"#d2b36e",ergonomic:"#9da8b5",radiation:"#b79cbd",slip:"#93aebc"};
 
+const CATEGORIES = {
+  estrutura: {
+    label: "Estrutura & Acessos",
+    types: ["wall", "door", "window", "zone", "exit"]
+  },
+  mobiliario: {
+    label: "Mobiliário & Pias",
+    types: ["bench", "benchL", "sink", "cabinet", "shelf"]
+  },
+  equipamentos: {
+    label: "Equipamentos & Exaustão",
+    types: ["hood", "equipment"]
+  },
+  seguranca: {
+    label: "Segurança de Emergência",
+    types: ["shower", "eyewash", "extinguisher"]
+  },
+  riscos: {
+    label: "Sinalização de Riscos",
+    types: RISK_TYPES
+  }
+};
+
 const state = {
   room:{w:12,h:8},
   cam:{x:6,y:4,zoom:70},
@@ -193,43 +216,104 @@ function drawObject(o){
   if(RISK_TYPES.includes(o.type)){
     drawRisk(o.type,w,h);
   } else if(o.type==="wall"){
-    ctx.fillStyle="#f1f3f4";ctx.fillRect(0,0,w,h);
+    ctx.fillStyle="#e2e8f0";ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="#475569";ctx.lineWidth=1.5;ctx.strokeRect(0,0,w,h);
   } else if(o.type==="bench"){
     drawBench(w,h);
   } else if(o.type==="benchL"){
-    const t=Math.max(8,Math.min(w,h)*.25);ctx.fillStyle="#6c7880";ctx.fillRect(0,0,w,t);ctx.fillRect(0,0,t,h);ctx.fillStyle="#8e9aa1";ctx.fillRect(0,0,w,Math.max(3,t*.18));ctx.fillRect(0,0,Math.max(3,t*.18),h);
-  } else if(o.type==="door"){
-    ctx.fillStyle="#ddd";ctx.fillRect(0,0,w,h);ctx.strokeStyle="#c5a46d";ctx.lineWidth=3;ctx.strokeRect(1,1,w-2,h-2);
+    const t=Math.max(10,Math.min(w,h)*0.28);
+    ctx.fillStyle="#64748b";ctx.fillRect(0,0,w,t);ctx.fillRect(0,0,t,h);
+    ctx.fillStyle="#94a3b8";ctx.fillRect(0,0,w,Math.max(3,t*0.15));ctx.fillRect(0,0,Math.max(3,t*0.15),h);
+    ctx.strokeStyle="#475569";ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(t,t);ctx.lineTo(w,t);ctx.moveTo(t,t);ctx.lineTo(t,h);ctx.stroke();
+  }else if(o.type==="door"){
+    ctx.fillStyle="#1b2329";
+    ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="#94a3b8";
+    ctx.lineWidth=1.5;
+    ctx.strokeRect(0,0,w,h);
+    
+    ctx.strokeStyle="#f8fbfc";
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(0,h);
+    ctx.lineTo(0,0);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(0, h, w, -Math.PI/2, 0);
+    ctx.strokeStyle="#fcf8f8";
+    ctx.lineWidth=1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
   } else if(o.type==="window"){
-    ctx.fillStyle="#85a5b8";ctx.fillRect(0,0,w,h);ctx.strokeStyle="#dce5e9";ctx.strokeRect(0,0,w,h);ctx.beginPath();ctx.moveTo(w/2,0);ctx.lineTo(w/2,h);ctx.stroke();
+    ctx.fillStyle="#0ea5e922";ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="#cbd5e1";ctx.lineWidth=2;ctx.strokeRect(0,0,w,h);
+    ctx.strokeStyle="#38bdf8";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
   } else if(o.type==="sink"){
-    ctx.fillStyle="#aab5bb";ctx.fillRect(0,0,w,h);ctx.fillStyle="#5f6c74";ctx.fillRect(w*.15,h*.15,w*.7,h*.7);
+    ctx.fillStyle="#94a3b8";ctx.fillRect(0,0,w,h);
+    ctx.fillStyle="#cbd5e1";
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(w*0.12, h*0.12, w*0.76, h*0.76, 4);
+    else ctx.rect(w*0.12, h*0.12, w*0.76, h*0.76);
+    ctx.fill();ctx.strokeStyle="#475569";ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle="#1e293b";ctx.beginPath();ctx.arc(w/2, h*0.22, Math.min(w,h)*0.08, 0, Math.PI*2);ctx.fill();
   } else if(o.type==="hood"){
-    ctx.fillStyle="#66747d";ctx.fillRect(0,0,w,h);ctx.fillStyle="#aab5bc";ctx.fillRect(w*.08,h*.18,w*.84,h*.62);ctx.fillStyle="#303940";ctx.fillRect(w*.08,h*.1,w*.84,h*.08);
+    ctx.fillStyle="#334155";ctx.fillRect(0,0,w,h);
+    ctx.fillStyle="#64748b";ctx.fillRect(w*0.06,h*0.12,w*0.88,h*0.76);
+    ctx.fillStyle="#0f172a";ctx.fillRect(w*0.1,h*0.18,w*0.8,h*0.55);
+    ctx.fillStyle="#38bdf8";ctx.beginPath();ctx.arc(w/2, h*0.45, Math.min(w,h)*0.12, 0, Math.PI*2);ctx.fill();
   } else if(["cabinet","shelf"].includes(o.type)){
-    ctx.fillStyle="#58656d";ctx.fillRect(0,0,w,h);ctx.strokeStyle="#aeb7bd";ctx.strokeRect(0,0,w,h);
-    if(o.type==="shelf"){ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();}
+    ctx.fillStyle="#475569";ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="#94a3b8";ctx.lineWidth=1.5;ctx.strokeRect(0,0,w,h);
+    if(o.type==="shelf"){
+      ctx.strokeStyle="#cbd5e1";ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
+    } else {
+      ctx.strokeStyle="#1e293b";ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(w/2,0);ctx.lineTo(w/2,h);ctx.stroke();
+    }
   } else if(o.type==="equipment"){
-    ctx.fillStyle="#d7dde1";ctx.fillRect(0,0,w,h);ctx.strokeStyle="#48535b";ctx.strokeRect(0,0,w,h);ctx.fillStyle="#273038";ctx.fillRect(w*.12,h*.15,w*.76,h*.28);
+    ctx.fillStyle="#cbd5e1";ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="#334155";ctx.lineWidth=1.5;ctx.strokeRect(0,0,w,h);
+    ctx.fillStyle="#0f172a";ctx.fillRect(w*0.12,h*0.15,w*0.76,h*0.3);
+    ctx.fillStyle="#22c55e";ctx.beginPath();ctx.arc(w*0.8, h*0.3, Math.min(w,h)*0.06, 0, Math.PI*2);ctx.fill();
   } else if(o.type==="zone"){
-    ctx.fillStyle="#8198a833";ctx.fillRect(0,0,w,h);ctx.setLineDash([5,4]);ctx.strokeStyle="#8199a7";ctx.strokeRect(0,0,w,h);ctx.setLineDash([]);
-  } else if(["shower","eyewash","extinguisher"].includes(o.type)){
-    ctx.fillStyle="#8fa4ad";ctx.beginPath();ctx.arc(w/2,h/2,Math.min(w,h)*.42,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle="#223039";ctx.stroke();
+    ctx.fillStyle="rgba(56, 189, 248, 0.08)";ctx.fillRect(0,0,w,h);
+    ctx.setLineDash([6,4]);ctx.strokeStyle="#38bdf8";ctx.lineWidth=1.5;ctx.strokeRect(0,0,w,h);ctx.setLineDash([]);
+  } else if(o.type==="extinguisher"){
+    ctx.fillStyle="#ef4444";ctx.beginPath();ctx.arc(w/2,h/2,Math.min(w,h)*0.45,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle="#991b1b";ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle="#ffffff";ctx.font=`bold ${Math.max(8,w*0.32)}px Arial`;ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("EXT",w/2,h/2);
+  } else if(o.type==="shower"||o.type==="eyewash"){
+    ctx.fillStyle="#0ea5e9";ctx.beginPath();ctx.arc(w/2,h/2,Math.min(w,h)*0.42,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle="#0369a1";ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle="#ffffff";ctx.font=`bold ${Math.max(8,w*0.32)}px Arial`;ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText(o.type==="shower"?"DU":"LO",w/2,h/2);
   } else if(o.type==="exit"){
-    ctx.strokeStyle="#8fa4ad";ctx.lineWidth=3;ctx.strokeRect(1,1,w-2,h-2);
-    ctx.beginPath();ctx.moveTo(w*.15,h/2);ctx.lineTo(w*.85,h/2);ctx.moveTo(w*.65,h*.25);ctx.lineTo(w*.85,h/2);ctx.lineTo(w*.65,h*.75);ctx.stroke();
+    ctx.fillStyle="#22c55e";ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle="#14532d";ctx.lineWidth=1.5;ctx.strokeRect(0,0,w,h);
+    ctx.fillStyle="#ffffff";ctx.font=`bold ${Math.max(8,w*0.28)}px Arial`;ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("SAÍDA",w/2,h/2);
   }
   ctx.restore();
 }
 
-function drawBench(w,h){ctx.fillStyle="#6c7880";ctx.fillRect(0,0,w,h);ctx.fillStyle="#8e9aa1";ctx.fillRect(0,0,w,Math.max(3,h*.14));ctx.fillStyle="#404b52";ctx.fillRect(w*.05,h*.18,w*.9,h*.72);}
+function drawBench(w,h){
+  ctx.fillStyle="#64748b";ctx.fillRect(0,0,w,h);
+  ctx.fillStyle="#94a3b8";ctx.fillRect(0,0,w,Math.max(3,h*0.16));
+  ctx.fillStyle="#334155";ctx.fillRect(w*0.04,h*0.2,w*0.92,h*0.72);
+}
+
 function drawRisk(type,w,h){
   const c=RISK_COLORS[type]||"#aebbc2";
-  const r=Math.min(w,h)*.36;
+  const r=Math.min(w,h)*0.38;
   ctx.fillStyle=c+"33";ctx.strokeStyle=c;ctx.lineWidth=2;
   ctx.beginPath();ctx.arc(w/2,h/2,r,0,Math.PI*2);ctx.fill();ctx.stroke();
-  ctx.fillStyle=c;ctx.font=`bold ${Math.max(10,Math.min(w,h)*.34)}px Arial`;ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillStyle=c;ctx.font=`bold ${Math.max(10,Math.min(w,h)*0.36)}px Arial`;ctx.textAlign="center";ctx.textBaseline="middle";
   const symbol={chemical:"Q",biological:"B",physical:"F",fire:"I",electrical:"E",ergonomic:"G",radiation:"R",slip:"C"}[type]||"?";
   ctx.fillText(symbol,w/2,h/2);
   ctx.textAlign="left";ctx.textBaseline="alphabetic";
@@ -322,6 +406,16 @@ $("fitRoom").onclick=fitRoom;
 $("applyRoom").onclick=applyRoom;
 $("undo").onclick=undo;$("redo").onclick=redo;
 
+// Ação do Botão de Voltar na barra lateral
+const btnBack = $("btnBack");
+if(btnBack){
+  btnBack.onclick = () => {
+    state.selected = null;
+    updateUI();
+    draw();
+  };
+}
+
 $("rotate").onclick=()=>{
   if(!state.selected)return;pushHistory();state.selected.rot=(state.selected.rot+90)%360;normalizeObject(state.selected);updateUI();draw();
 };
@@ -341,7 +435,6 @@ $("applyProps").onclick=()=>{
   pushHistory();Object.assign(state.selected,vals);normalizeObject(state.selected);updateUI();draw();
 };
 
-// --- CONTROLES DOS PAINÉIS MOBILE/TABLET ---
 const btnToggleTools = document.getElementById("btnToggleTools");
 const btnToggleProps = document.getElementById("btnToggleProps");
 const leftPanelElem = document.querySelector(".left-panel");
@@ -367,13 +460,89 @@ if (btnToggleProps && rightPanelElem) {
   });
 }
 
+function renderObjectsTree() {
+  const treeContainer = $("objectsTree");
+  const totalBadge = $("totalObjectsBadge");
+  if (!treeContainer) return;
+
+  if (state.objects.length === 0) {
+    totalBadge.textContent = "0 itens";
+    treeContainer.innerHTML = `<div class="empty-tree-msg">Nenhum elemento adicionado ao laboratório ainda.</div>`;
+    return;
+  }
+
+  totalBadge.textContent = `${state.objects.length} item${state.objects.length > 1 ? 's' : ''}`;
+  let html = "";
+
+  Object.keys(CATEGORIES).forEach(catKey => {
+    const cat = CATEGORIES[catKey];
+    const itemsInCat = state.objects.filter(o => cat.types.includes(o.type));
+
+    if (itemsInCat.length > 0) {
+      html += `
+        <div class="tree-category">
+          <div class="tree-category-title">${cat.label} (${itemsInCat.length})</div>
+          <div class="tree-category-items">
+      `;
+
+      itemsInCat.forEach((o, index) => {
+        const typeName = TYPES[o.type]?.[0] || o.type;
+        const isSelected = state.selected && state.selected.id === o.id;
+        html += `
+          <div class="tree-item ${isSelected ? 'active' : ''}" data-id="${o.id}">
+            <span class="tree-item-name">${typeName} #${index + 1}</span>
+            <span class="tree-item-coords">(${o.x.toFixed(1)}m, ${o.y.toFixed(1)}m)</span>
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  treeContainer.innerHTML = html;
+
+  treeContainer.querySelectorAll(".tree-item").forEach(item => {
+    item.addEventListener("click", () => {
+      const id = item.dataset.id;
+      const found = state.objects.find(obj => obj.id === id);
+      if (found) {
+        state.selected = found;
+        updateUI();
+        draw();
+      }
+    });
+  });
+}
+
 function updateUI(){
   const o=state.selected;
-  $("title").textContent=o?(TYPES[o.type]?.[0]||o.type):"Nenhum elemento";
-  $("sub").textContent=o?"Edite posição, tamanho e rotação.":"Selecione um objeto no mapa para editar.";
-  $("emptyProps").classList.toggle("hidden",!!o);$("props").classList.toggle("hidden",!o);
-  if(o){$("x").value=o.x.toFixed(2);$("y").value=o.y.toFixed(2);$("w").value=o.w.toFixed(2);$("h").value=o.h.toFixed(2);$("rot").value=o.rot;$("rotVal").textContent=o.rot+"°";}
-  const count={};RISK_TYPES.forEach(t=>count[t]=0);state.objects.forEach(x=>{if(count[x.type]!==undefined)count[x.type]++;});
+  $("title").textContent=o?(TYPES[o.type]?.[0]||o.type):"Visão Geral do Mapa";
+  $("sub").textContent=o?"Edite posição, tamanho e rotação.":"Lista de elementos posicionados por categoria.";
+  
+  // Alterna visibilidade do botão de voltar
+  if(btnBack) btnBack.classList.toggle("hidden", !o);
+
+  $("emptyProps").classList.toggle("hidden",!!o);
+  $("props").classList.toggle("hidden",!o);
+
+  if(!o){
+    renderObjectsTree();
+  } else {
+    $("x").value=o.x.toFixed(2);
+    $("y").value=o.y.toFixed(2);
+    $("w").value=o.w.toFixed(2);
+    $("h").value=o.h.toFixed(2);
+    $("rot").value=o.rot;
+    $("rotVal").textContent=o.rot+"°";
+  }
+
+  const count={};
+  RISK_TYPES.forEach(t=>count[t]=0);
+  state.objects.forEach(x=>{if(count[x.type]!==undefined)count[x.type]++;});
   $("riskList").innerHTML=RISK_TYPES.filter(t=>count[t]).map(t=>`<div class="risk-row"><span><i class="risk-dot" style="background:${RISK_COLORS[t]}"></i>${TYPES[t][0]}</span><b>${count[t]}</b></div>`).join("") || '<div class="risk-row">Nenhum risco inserido.</div>';
   
   const c1Valid = state.room.w>=2&&state.room.h>=2;
@@ -391,14 +560,12 @@ function updateUI(){
   $("c6").classList.toggle("ok",c6Valid); $("c6").classList.toggle("checked",c6Valid);
 }
 
-// Salvar Projeto (JSON)
 $("save").onclick=()=>{
   const data={version:2,date:new Date().toISOString(),room:state.room,objects:state.objects};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mapa-de-riscos-laboratorio.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
 };
 
-// Exportar para Vetor SVG (Corrigido e Seguro)
 const exportSvgBtn = $("exportSvg");
 if (exportSvgBtn) {
   exportSvgBtn.onclick = () => {
