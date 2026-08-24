@@ -492,32 +492,65 @@ IDENTIFICADORES DE RISCOS
   color:#b8c6cd
 }
 .check.ok span{
-  background:#7d9d91
-/*---------------------------------
+  background:#7d9d91/*---------------------------------
     RESPONSIVIDADE DO PROGRAMA
 ------------------------------------*/
+.mobile-only {
+  display: none; /* Esconde no desktop */
+}
+
 @media(max-width:1100px){
-  .workspace{
-  grid-template-columns:240px 1fr 220px
+  .workspace { grid-template-columns: 240px 1fr 220px }
+  .brand { min-width: 230px }
+  .stepper { display: none }
+}
+
+@media(max-width:760px){
+  .mobile-only { display: block; }
+  
+  .workspace {
+    grid-template-columns: 1fr;
+    position: relative;
+    overflow: hidden;
   }
-  .brand{
-    min-width:230px
+  
+  /* Transforma os painéis em gavetas flutuantes */
+  .left-panel, .right-panel {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    z-index: 50;
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 25px rgba(0,0,0,0.8);
+    display: block; /* Sobrescreve o display: none anterior */
   }
-  .stepper{
-    display:none
+
+  .left-panel {
+    left: 0;
+    transform: translateX(-120%); /* Escondido à esquerda */
+  }
+  
+  .right-panel {
+    right: 0;
+    transform: translateX(120%); /* Escondido à direita */
+  }
+
+  /* Classes que o JS vai injetar para mostrar os painéis */
+  .left-panel.open, .right-panel.open {
+    transform: translateX(0);
+  }
+
+  .canvas-toolbar {
+    top: auto;
+    bottom: 20px; /* Move a barra de ferramentas do canvas para baixo no mobile */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .canvas-help {
+    display: none;
   }
 }
-@media(max-width:760px){
-  .workspace{
-    grid-template-columns:1fr
-  }
-  .left-panel,.right-panel{
-    display:none
-  }
-  .canvas-toolbar{
-    left:10px;transform:none
-  }
-  .canvas-help{
-    display:none
-  }
 }
