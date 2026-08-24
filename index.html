@@ -171,50 +171,53 @@
         <div class="canvas-help">Clique para adicionar · arraste para mover · Shift + arraste para pan · roda para zoom</div>
       </section>
 <!-- PAINEL DIREITO: PROPRIEDADES E VERIFICAÇÃO -->
+      <div class="right-panel">
 
-  <div class="selection-head">
-    <!-- Botão de voltar integrado ao topo da seção de cabeçalho -->
-    <button id="btnBack" class="btn-back hidden">← Voltar para a lista</button>
-    
-    <span class="eyebrow">PROPRIEDADES</span>
-    <h2 id="title">Nenhum elemento</h2>
-    <p id="sub">Selecione um objeto no mapa para editar.</p>
-  </div>
+        <div class="selection-head">
+          <!-- Botão de voltar integrado no topo -->
+          <button id="btnBack" class="btn-back hidden">← Voltar para a lista</button>
+          
+          <span class="eyebrow">PROPRIEDADES</span>
+          <h2 id="title">Nenhum elemento</h2>
+          <p id="sub">Selecione um objeto no mapa para editar.</p>
+        </div>
 
-  <!-- Painel exibido quando NENHUM elemento está selecionado -->
-  <div id="emptyProps" class="empty-state">
-    <div class="tree-header">
-      <h3>Elementos no Mapa</h3>
-      <span id="totalObjectsBadge" class="badge">0 itens</span>
-    </div>
-    <p class="help-text">Clique em um item da lista para selecioná-lo e editá-lo no mapa.</p>
-    
-    <div id="objectsTree" class="objects-tree">
-      <!-- As categorias e elementos serão inseridos dinamicamente aqui pelo JavaScript -->
-    </div>
-  </div>
+        <!-- Painel exibido quando NENHUM elemento está selecionado -->
+        <div id="emptyProps" class="empty-state">
+          <div class="tree-header">
+            <h3>Elementos no Mapa</h3>
+            <span id="totalObjectsBadge" class="badge">0 itens</span>
+          </div>
+          <p class="help-text">Clique em um item da lista para selecioná-lo e editá-lo no mapa.</p>
+          
+          <div id="objectsTree" class="objects-tree">
+            <!-- As categorias e elementos serão inseridos dinamicamente aqui pelo JavaScript -->
+          </div>
+        </div>
 
-  <div id="props" class="hidden">
-    <div class="prop-section">
-      <div class="section-title">Transformação</div>
-      <label>Posição X<div class="input-unit"><input id="x" type="number" step=".01"><span>m</span></div></label>
-      <label>Posição Y<div class="input-unit"><input id="y" type="number" step=".01"><span>m</span></div></label>
-      <div class="two">
-        <label>Largura<div class="input-unit"><input id="w" type="number" min=".05" step=".01"><span>m</span></div></label>
-        <label>Profundidade<div class="input-unit"><input id="h" type="number" min=".05" step=".01"><span>m</span></div></label>
+        <div id="props" class="hidden">
+          <div class="prop-section">
+            <div class="section-title">Transformação</div>
+            <label>Posição X<div class="input-unit"><input id="x" type="number" step=".01"><span>m</span></div></label>
+            <label>Posição Y<div class="input-unit"><input id="y" type="number" step=".01"><span>m</span></div></label>
+            <div class="two">
+              <label>Largura<div class="input-unit"><input id="w" type="number" min=".05" step=".01"><span>m</span></div></label>
+              <label>Profundidade<div class="input-unit"><input id="h" type="number" min=".05" step=".01"><span>m</span></div></label>
+            </div>
+            <label>Rotação
+              <div class="rotation"><input id="rot" type="range" min="0" max="359" value="0"><output id="rotVal">0°</output></div>
+            </label>
+            <button class="primary full" id="applyProps">Aplicar alterações</button>
+          </div>
+          <div class="quick-actions">
+            <button id="rotate">Girar 90°</button>
+            <button id="duplicate">Duplicar</button>
+          </div>
+          <button class="danger full" id="delete">Excluir elemento</button>
+        </div>  
+
       </div>
-      <label>Rotação
-        <div class="rotation"><input id="rot" type="range" min="0" max="359" value="0"><output id="rotVal">0°</output></div>
-      </label>
-      <button class="primary full" id="applyProps">Aplicar alterações</button>
-    </div>
-    <div class="quick-actions">
-      <button id="rotate">Girar 90°</button>
-      <button id="duplicate">Duplicar</button>
-    </div>
-    <button class="danger full" id="delete">Excluir elemento</button>
-  </div>
-
+      
         <div class="risk-summary">
           <div class="section-title">Resumo de riscos</div>
           <div id="riskList" class="risk-list"></div>
