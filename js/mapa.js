@@ -250,17 +250,34 @@ function setMode(tool){
   if(tool==="pan") $("panMode").classList.add("active");
   document.querySelectorAll("#palette button").forEach(b=>b.classList.toggle("chosen",b.dataset.type===tool));
 }
+// --- ADICIONE ESTE CÓDIGO NO FINAL DO SEU JS ---
+const leftPanel = document.querySelector(".left-panel");
+const rightPanel = document.querySelector(".right-panel");
 
-canvas.addEventListener("pointerdown",e=>{
-  const p={x:e.offsetX,y:e.offsetY};state.last=p;
-  if(e.button===1||e.shiftKey||state.tool==="pan"){state.pan=true;canvas.setPointerCapture(e.pointerId);return;}
-  if(state.tool==="select"){
-    const o=hitTest(p.x,p.y);state.selected=o;
-    if(o){pushHistory();const q=screenToWorld(p.x,p.y);state.drag={o,dx:q.x-o.x,dy:q.y-o.y};}
-    updateUI();draw();
-  } else {
-    const q=screenToWorld(p.x,p.y);
-    if(roomPointInside(q.x,q.y)) addObject(state.tool,q.x,q.y);
+// Cria dinamicamente os botões de controle mobile na barra superior se já não existirem
+const topActions = document.querySelector(".top-actions") || document.querySelector(".topbar");
+if (topActions && !document.getElementById("btnToggleTools")) {
+  const mobileNavHTML = `
+    <button id="btnToggleTools" class="mobile-only" style="background:#202930; border:1px solid var(--line); margin-right:5px;">Ferramentas</button>
+    <button id="btnToggleProps" class="mobile-only" style="background:#202930; border:1px solid var(--line);">Propriedades</button>
+  `;
+  topActions.insertAdjacentHTML("afterbegin", mobileNavHTML);
+
+  document.getElementById("btnToggleTools").onclick = () => {
+    leftPanel.classList.toggle("open");
+    rightPanel.classList.remove("open");
+  };
+  document.getElementById("btnToggleProps").onclick = () => {
+    rightPanel.classList.toggle("open");
+    leftPanel.classList.remove("open");
+  };
+}
+
+// Fecha as gavetas ao tocar no canvas no celular
+canvas.addEventListener("pointerdown", () => {
+  if(window.innerWidth <= 760) {
+    leftPanel.classList.remove("open");
+    rightPanel.classList.remove("open");
   }
 });
 canvas.addEventListener("pointermove",e=>{
@@ -343,114 +360,7 @@ $("fileInput").addEventListener("change",async e=>{
   }catch(err){alert("Não foi possível abrir o mapa: "+err.message);}
   e.target.value="";
 });
-// Controles de interface mobile
-const btnTools = document.getElementById("btnToggleTools");
-const btnProps = document.getElementById("btnToggleProps");
-const leftPanel = document.querySelector(".left-panel");
-const rightPanel = document.querySelector(".right-panel");
 
-if(btnTools && btnProps) {
-  btnTools.onclick = () => {
-    leftPanel.classList.toggle("open");
-    rightPanel.classList.remove("open"); // Fecha o outro se estiver aberto
-  };
-  btnProps.onclick = () => {
-    rightPanel.classList.toggle("open");
-    leftPanel.classList.remove("open");
-  };
-}
-
-// --- SUBSTITUA SEUS EVENTOS POINTER ATUAIS POR ESTES ---
-
-const activePointers = new Map();
-let initialPinchDist = null;
-let initialZoom = null;
-
-canvas.addEventListener("pointerdown", e => {
-  // Guarda o toque atual
-  activePointers.set(e.pointerId, { x: e.offsetX, y: e.offsetY });
-  
-  // Se tiver dois dedos na tela, inicia o Pinch-to-zoom
-  if (activePointers.size === 2) {
-    const pts = Array.from(activePointers.values());
-    initialPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-    initialZoom = state.cam.zoom;
-    state.pan = false; // Cancela o pan único se for zoom
-    state.drag = null;
-    return;
-  }
-
-  const p = {x: e.offsetX, y: e.offsetY}; 
-  state.last = p;
-  
-  if(e.button === 1 || e.shiftKey || state.tool === "pan"){
-    state.pan = true; 
-    canvas.setPointerCapture(e.pointerId); 
-    return;
-  }
-  
-  if(state.tool === "select"){
-    const o = hitTest(p.x, p.y); 
-    state.selected = o;
-    if(o){
-      pushHistory();
-      const q = screenToWorld(p.x, p.y); 
-      state.drag = {o, dx: q.x - o.x, dy: q.y - o.y};
-    }
-    updateUI(); draw();
-  } else {
-    const q = screenToWorld(p.x, p.y);
-    if(roomPointInside(q.x, q.y)) addObject(state.tool, q.x, q.y);
-  }
-});
-
-canvas.addEventListener("pointermove", e => {
-  if (activePointers.has(e.pointerId)) {
-    activePointers.set(e.pointerId, { x: e.offsetX, y: e.offsetY });
-  }
-
-  // Lógica de Zoom com 2 dedos (Pinch)
-  if (activePointers.size === 2) {
-    const pts = Array.from(activePointers.values());
-    const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-    if (initialPinchDist) {
-      const scale = dist / initialPinchDist;
-      state.cam.zoom = clamp(initialZoom * scale, 15, 220);
-      updateZoomText(); 
-      draw();
-    }
-    return;
-  }
-
-  const p = {x: e.offsetX, y: e.offsetY};
-  if(state.pan){
-    state.cam.x -= (p.x - state.last.x) / state.cam.zoom;
-    state.cam.y -= (p.y - state.last.y) / state.cam.zoom;
-    state.last = p; 
-    draw();
-  } else if(state.drag){
-    const q = screenToWorld(p.x, p.y);
-    state.drag.o.x = snap(q.x - state.drag.dx);
-    state.drag.o.y = snap(q.y - state.drag.dy);
-    normalizeObject(state.drag.o);
-    updateUI(); 
-    draw();
-  }
-});
-
-const removePointer = (e) => {
-  activePointers.delete(e.pointerId);
-  if (activePointers.size < 2) initialPinchDist = null;
-  state.pan = false; 
-  state.drag = null;
-};
-
-canvas.addEventListener("pointerup", removePointer);
-canvas.addEventListener("pointercancel", removePointer);
-canvas.addEventListener("pointerout", removePointer); // Previne bugar se o dedo sair da tela
-
-// O evento de wheel (scroll) original permanece o mesmo para uso no PC
-canvas.addEventListener("wheel", e => { ... });
 window.addEventListener("keydown",e=>{
   if(e.key==="Delete")$("delete").click();
   if(e.ctrlKey&&e.key.toLowerCase()==="z"){e.preventDefault();undo();}
