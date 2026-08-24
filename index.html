@@ -22,10 +22,14 @@
       </div>
 
       <!-- Botões mobile fixos no cabeçalho -->
-      <div class="mobile-nav-controls">
-        <button id="btnToggleTools" class="mobile-only-btn" type="button">Ferramentas</button>
-        <button id="btnToggleProps" class="mobile-only-btn" type="button">Propriedades</button>
-      </div>
+<div class="mobile-nav-controls">
+  <button id="btnToggleTools" class="mobile-only-btn" type="button">
+    <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+  </button>
+  <button id="btnToggleProps" class="mobile-only-btn" type="button">
+    <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+</div>
 
       <div class="stepper">
         <span class="step active">1 <b>Ambiente</b></span>
@@ -36,11 +40,26 @@
       </div>
 
       <div class="top-actions">
-        <button id="undo" title="Desfazer">↶</button>
-        <button id="redo" title="Refazer">↷</button>
-        <button id="save">Salvar mapa</button>
-        <button id="exportSvg">Salvar SVG</button>
-        <button id="load">Abrir mapa</button>
+        <button id="undo" title="Desfazer">
+          <svg viewBox="0 0 24 24"><path d="M3 7v6h6M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+          <span class="btn-label">Desfazer</span>
+        </button>
+        <button id="redo" title="Refazer">
+          <svg viewBox="0 0 24 24"><path d="M21 7v6h-6M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></svg>
+          <span class="btn-label">Refazer</span>
+        </button>
+        <button id="save" title="Salvar">
+          <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2zM17 21v-8H7v8M7 3v5h8"/></svg>
+          <span>Salvar</span>
+        </button>
+        <button id="exportSvg" title="Exportar SVG">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M12 18v-6M9 15l3 3 3-3"/></svg>
+          <span>SVG</span>
+        </button>
+        <button id="load" title="Abrir arquivo">
+          <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>Abrir</span>
+        </button>
       </div>
     </header>
 
@@ -114,57 +133,89 @@
       <section class="canvas-area">
         <div class="canvas-toolbar">
           <div class="tool-group">
-            <button class="mode active" id="selectMode">Selecionar</button>
-            <button class="mode" id="panMode">Mover mapa</button>
+            <button class="mode active" id="selectMode" title="Selecionar elementos">
+              <svg viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+              <span>Selecionar</span>
+            </button>
+            <button class="mode" id="panMode" title="Mover área do mapa">
+              <svg viewBox="0 0 24 24"><path d="M5 9l-3 3 3 3M19 9l3 3-3 3M9 5l3-3 3 3M9 19l3 3 3-3M12 12h0"/></svg>
+              <span>Mover</span>
+            </button>
           </div>
+
           <div class="tool-group">
-            <button id="grid">Grade</button>
-            <button id="snap">Snap 10 cm</button>
-            <button id="ruler">Cotas</button>
+            <button id="grid" title="Alternar grade de referência">
+              <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+              <span>Grade</span>
+            </button>
+            <button id="snap" title="Alinhamento magnético (Snap 10 cm)">
+              <svg viewBox="0 0 24 24"><path d="M6 3v6a6 6 0 0 0 12 0V3M4 3h4M16 3h4M12 15v6M9 18h6"/></svg>
+              <span>Snap</span>
+            </button>
+            <button id="ruler" title="Exibir cotas e medidas">
+              <svg viewBox="0 0 24 24"><path d="M2 4h20v16H2zM6 4v4M10 4v2M14 4v4M18 4v2"/></svg>
+              <span>Cotas</span>
+            </button>
           </div>
+
           <div class="zoom">
-            <button id="zoomOut">−</button>
+            <button id="zoomOut" title="Diminuir Zoom">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>
+            </button>
             <span id="zoomText">100%</span>
-            <button id="zoomIn">+</button>
+            <button id="zoomIn" title="Aumentar Zoom">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
           </div>
         </div>
         <canvas id="canvas" tabindex="0" aria-label="Mapa 2D do laboratório"></canvas>
         <div class="canvas-help">Clique para adicionar · arraste para mover · Shift + arraste para pan · roda para zoom</div>
       </section>
+<!-- PAINEL DIREITO: PROPRIEDADES E VERIFICAÇÃO -->
+<aside class="right-panel">
 
-      <!-- PAINEL DIREITO: PROPRIEDADES E VERIFICAÇÃO -->
-      <aside class="right-panel">
-        <div class="selection-head">
-          <span class="eyebrow">PROPRIEDADES</span>
-          <h2 id="title">Nenhum elemento</h2>
-          <p id="sub">Selecione um objeto no mapa para editar.</p>
-        </div>
+  <div class="selection-head">
+    <!-- Botão de voltar integrado ao topo da seção de cabeçalho -->
+    <button id="btnBack" class="btn-back hidden">← Voltar para a lista</button>
+    
+    <span class="eyebrow">PROPRIEDADES</span>
+    <h2 id="title">Nenhum elemento</h2>
+    <p id="sub">Selecione um objeto no mapa para editar.</p>
+  </div>
 
-        <div id="emptyProps" class="properties-empty">
-          <div class="target-icon">+</div>
-          <span>Selecione um elemento</span>
-        </div>
+  <!-- Painel exibido quando NENHUM elemento está selecionado -->
+  <div id="emptyProps" class="empty-state">
+    <div class="tree-header">
+      <h3>Elementos no Mapa</h3>
+      <span id="totalObjectsBadge" class="badge">0 itens</span>
+    </div>
+    <p class="help-text">Clique em um item da lista para selecioná-lo e editá-lo no mapa.</p>
+    
+    <div id="objectsTree" class="objects-tree">
+      <!-- As categorias e elementos serão inseridos dinamicamente aqui pelo JavaScript -->
+    </div>
+  </div>
 
-        <div id="props" class="hidden">
-          <div class="prop-section">
-            <div class="section-title">Transformação</div>
-            <label>Posição X<div class="input-unit"><input id="x" type="number" step=".01"><span>m</span></div></label>
-            <label>Posição Y<div class="input-unit"><input id="y" type="number" step=".01"><span>m</span></div></label>
-            <div class="two">
-              <label>Largura<div class="input-unit"><input id="w" type="number" min=".05" step=".01"><span>m</span></div></label>
-              <label>Profundidade<div class="input-unit"><input id="h" type="number" min=".05" step=".01"><span>m</span></div></label>
-            </div>
-            <label>Rotação
-              <div class="rotation"><input id="rot" type="range" min="0" max="359" value="0"><output id="rotVal">0°</output></div>
-            </label>
-            <button class="primary full" id="applyProps">Aplicar alterações</button>
-          </div>
-          <div class="quick-actions">
-            <button id="rotate">Girar 90°</button>
-            <button id="duplicate">Duplicar</button>
-          </div>
-          <button class="danger full" id="delete">Excluir elemento</button>
-        </div>
+  <div id="props" class="hidden">
+    <div class="prop-section">
+      <div class="section-title">Transformação</div>
+      <label>Posição X<div class="input-unit"><input id="x" type="number" step=".01"><span>m</span></div></label>
+      <label>Posição Y<div class="input-unit"><input id="y" type="number" step=".01"><span>m</span></div></label>
+      <div class="two">
+        <label>Largura<div class="input-unit"><input id="w" type="number" min=".05" step=".01"><span>m</span></div></label>
+        <label>Profundidade<div class="input-unit"><input id="h" type="number" min=".05" step=".01"><span>m</span></div></label>
+      </div>
+      <label>Rotação
+        <div class="rotation"><input id="rot" type="range" min="0" max="359" value="0"><output id="rotVal">0°</output></div>
+      </label>
+      <button class="primary full" id="applyProps">Aplicar alterações</button>
+    </div>
+    <div class="quick-actions">
+      <button id="rotate">Girar 90°</button>
+      <button id="duplicate">Duplicar</button>
+    </div>
+    <button class="danger full" id="delete">Excluir elemento</button>
+  </div>
 
         <div class="risk-summary">
           <div class="section-title">Resumo de riscos</div>
