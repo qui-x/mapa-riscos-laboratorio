@@ -393,6 +393,7 @@ $("save").onclick=()=>{
 };
 
 // Exportar para Vetor SVG (Adicionado aqui)
+// Exportar para Vetor SVG (Corrigido)
 const exportSvgBtn = $("exportSvg");
 if (exportSvgBtn) {
   exportSvgBtn.onclick = () => {
@@ -402,6 +403,18 @@ if (exportSvgBtn) {
 
     let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgW} ${svgH}" width="100%" height="100%">`;
     svgContent += `<rect width="${svgW}" height="${svgH}" fill="#c6ccd0" stroke="#f1f3f4" stroke-width="8"/>`;
+
+    // Mapa de símbolos para os riscos
+    const riskSymbols = {
+      chemical: "Q",
+      biological: "B",
+      physical: "F",
+      fire: "I",
+      electrical: "E",
+      ergonomic: "G",
+      radiation: "R",
+      slip: "C"
+    };
 
     state.objects.forEach(o => {
       const ox = o.x * scale;
@@ -417,8 +430,11 @@ if (exportSvgBtn) {
       if (RISK_TYPES.includes(o.type)) {
         const color = RISK_COLORS[o.type] || "#aebbc2";
         const r = Math.min(ow, oh) * 0.36;
+        const symbol = riskSymbols[o.type] || "?";
+        const fontSize = Math.max(10, Math.min(ow, oh) * 0.34);
+
         svgContent += `<circle cx="${ow/2}" cy="${oh/2}" r="${r}" fill="${color}33" stroke="${color}" stroke-width="2"/>`;
-        svgContent += `<text x="${ow/2}" y="${oh/2}" font-family="Arial" font-size="${Math.max(10, Math.min(ow, oh)*0.34)}" font-weight="bold" fill="${color}" text-anchor="middle" dominant-baseline="central">${({chemical:"Q",biological:"B",physical:"F",fire:"I",electrical:"E",ergonomic:"G",radiation:"R",slip:"C"})[o.type]||"?"}</text>`;
+        svgContent += `<text x="${ow/2}" y="${oh/2}" font-family="Arial" font-size="${fontSize}" font-weight="bold" fill="${color}" text-anchor="middle" dominant-baseline="central">${symbol}</text>`;
       } else if (o.type === "door") {
         svgContent += `<rect width="${ow}" height="${oh}" fill="#ddd" stroke="#c5a46d" stroke-width="3"/>`;
       } else if (o.type === "window") {
@@ -441,7 +457,6 @@ if (exportSvgBtn) {
     setTimeout(() => URL.revokeObjectURL(a.href), 500);
   };
 }
-
 $("load").onclick=()=>$("fileInput").click();
 $("fileInput").addEventListener("change",async e=>{
   const f=e.target.files[0];if(!f)return;
