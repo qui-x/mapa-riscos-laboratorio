@@ -8,6 +8,7 @@
 </head>
 <body>
 <div class="app">
+  
 <header class="topbar">
   <div class="brand">
     <div class="brand-mark" aria-hidden="true">
@@ -15,14 +16,19 @@
     </div>
     <div><strong>Mapa de Riscos do Laboratório</strong><small>Editor 2D em escala métrica</small></div>
   </div>
+
+  <!-- Botões mobile fixos no HTML -->
+  <div class="mobile-nav-controls">
+    <button id="btnToggleTools" class="mobile-only-btn" type="button">Ferramentas</button>
+    <button id="btnToggleProps" class="mobile-only-btn" type="button">Propriedades</button>
+  </div>
+
   <div class="stepper"><span class="step active">1 <b>Ambiente</b></span><i></i><span class="step active">2 <b>Riscos</b></span><i></i><span class="step">3 <b>Conferir</b></span></div>
   <div class="top-actions">
     <button id="undo" title="Desfazer">↶</button>
     <button id="redo" title="Refazer">↷</button>
     <button id="save">Salvar mapa</button>
     <button id="load">Abrir mapa</button>
-    <button id="btnToggleTools" class="mobile-only">Ferramentas</button>
-    <button id="btnToggleProps" class="mobile-only">Propriedades</button>
   </div>
 </header>
 
