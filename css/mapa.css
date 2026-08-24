@@ -6,7 +6,7 @@ CORES PADRÃO EM ESCALA DE CINZA
 --panel:#151b20;
 --panel2:#1b2329;
 --line:#2d3840;
---text:#e7ecef;
+--text:#ffffff;
 --muted:#8f9ba5;
 --accent:#7ea8c4;
 --accent2:#b9d0de;
@@ -366,6 +366,8 @@ AREA DO DESENHO DO LABORATORIO
   display:block;
   width:100%;
   height:100%;
+  margin: 0;
+  padding:0;
   cursor:crosshair;
   outline:none
 }
