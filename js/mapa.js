@@ -5,16 +5,29 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 const TYPES = {
-  wall:["Parede",2.4,.12],door:["Porta",.9,.12],window:["Janela",1.5,.12],
-  bench:["Bancada",2.4,.75],benchL:["Bancada L",2.2,2.2],sink:["Pia",.7,.6],
-  hood:["Capela",1.8,.85],cabinet:["Armário",1.2,.55],shelf:["Estante",1.1,.5],
-  equipment:["Equipamento",.65,.55],zone:["Circulação",2,1.2],
-  chemical:["Risco químico",1.1,1.1],biological:["Risco biológico",1.1,1.1],
-  physical:["Risco físico",1.1,1.1],fire:["Risco de incêndio",1.1,1.1],
-  electrical:["Risco elétrico",1.1,1.1],ergonomic:["Risco ergonômico",1.1,1.1],
-  radiation:["Risco de radiação",1.1,1.1],slip:["Risco de queda",1.1,1.1],
-  shower:["Chuveiro de emergência",.55,.55],eyewash:["Lava-olhos",.45,.45],
-  extinguisher:["Extintor",.25,.25],exit:["Saída de emergência",.9,.12]
+  wall:["Parede",2.4,.12],
+  door:["Porta",.9,.12],
+  window:["Janela",1.5,.12],
+  bench:["Bancada",2.4,.75],
+  benchL:["Bancada L",2.2,2.2],
+  sink:["Pia",.7,.6],
+  hood:["Capela",1.8,.85],
+  cabinet:["Armário",1.2,.55],
+  shelf:["Estante",1.1,.5],
+  equipment:["Equipamento",.65,.55],
+  zone:["Circulação",2,1.2],
+  chemical:["Risco químico",1.1,1.1],
+  biological:["Risco biológico",1.1,1.1],
+  physical:["Risco físico",1.1,1.1],
+  fire:["Risco de incêndio",1.1,1.1],
+  electrical:["Risco elétrico",1.1,1.1],
+  ergonomic:["Risco ergonômico",1.1,1.1],
+  radiation:["Risco de radiação",1.1,1.1],
+  slip:["Risco de queda",1.1,1.1],
+  shower:["Chuveiro de emergência",.55,.55],
+  eyewash:["Lava-olhos",.45,.45],
+  extinguisher:["Extintor",.25,.25],
+  exit:["Saída de emergência",.9,.12]
 };
 
 const RISK_TYPES = ["chemical","biological","physical","fire","electrical","ergonomic","radiation","slip"];
@@ -26,14 +39,7 @@ const state = {
   grid:true,snap:true,ruler:false,tool:"select",
   selected:null,drag:null,pan:false,last:null,
   history:[],future:[],
-  objects:[
-    {id:"b1",type:"bench",x:1.2,y:1.7,w:3,h:.75,rot:0},
-    {id:"b2",type:"bench",x:5,y:1.7,w:3,h:.75,rot:0},
-    {id:"h1",type:"hood",x:9.2,y:.8,w:1.8,h:.85,rot:0},
-    {id:"s1",type:"sink",x:9.3,y:2,w:.8,h:.6,rot:0},
-    {id:"d1",type:"door",x:5.55,y:7.88,w:.9,h:.12,rot:0},
-    {id:"z1",type:"zone",x:4,y:4.3,w:4,h:1.5,rot:0}
-  ]
+  objects:[]
 };
 
 const $ = id => document.getElementById(id);
