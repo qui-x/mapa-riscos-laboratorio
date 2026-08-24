@@ -1,4 +1,4 @@
-(() => {
+(function() {
 "use strict";
 
 const canvas = document.getElementById("canvas");
@@ -34,6 +34,21 @@ const RISK_TYPES = ["chemical","biological","physical","fire","electrical","ergo
 const RISK_COLORS = {chemical:"#c8a16d",biological:"#8fb09a",physical:"#a9a0bf",fire:"#c8836f",electrical:"#d2b36e",ergonomic:"#9da8b5",radiation:"#b79cbd",slip:"#93aebc"};
 
 const EQUIPMENT_TYPES = ["shower", "eyewash", "extinguisher"];
+
+// Dicionário nativo para geração vetorial completa no SVG exportado
+const NATIVE_SVG_TEMPLATES = {
+  extinguisher: '<circle cx="50" cy="50" r="44" fill="#ef444422" stroke="#ef4444" stroke-width="3.5"/><rect x="40" y="38" width="20" height="35" rx="4" fill="#ef4444" opacity="0.85"/><path d="M38 73 h24" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/><path d="M46 38 v-5 h8 v5" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M50 33 l8 -6" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/><path d="M60 44 c6 0 8 6 4 12" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>',
+  eyewash: '<circle cx="50" cy="50" r="44" fill="#0ea5e922" stroke="#0ea5e9" stroke-width="3.5"/><path d="M36 55 c0 11 28 11 28 0 z" fill="#0ea5e9" opacity="0.8"/><path d="M47 55 v13 h6 v-13" fill="#0ea5e9"/><rect x="38" y="68" width="24" height="4" rx="2" fill="#0ea5e9"/><path d="M38 52 q-4 -12 5 -15" fill="none" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round"/><path d="M62 52 q4 -12 -5 -15" fill="none" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round"/><path d="M43 37 q7 -7 14 0" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>',
+  shower: '<circle cx="50" cy="50" r="44" fill="#0ea5e922" stroke="#0ea5e9" stroke-width="3.5"/><path d="M36 28 h22 c3 0 5 2 5 5 v4" fill="none" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M54 37 h18 l-3 8 h-12 z" fill="#0ea5e9"/><path d="M51 54 l-3 10 M59 54 v12 M67 54 l3 10" fill="none" stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 4"/>',
+  biological: '<circle cx="50" cy="50" r="44" fill="#8fb09a22" stroke="#8fb09a" stroke-width="3.5"/><circle cx="50" cy="38" r="12" fill="none" stroke="#8fb09a" stroke-width="4"/><circle cx="39" cy="58" r="12" fill="none" stroke="#8fb09a" stroke-width="4"/><circle cx="61" cy="58" r="12" fill="none" stroke="#8fb09a" stroke-width="4"/><circle cx="50" cy="50" r="5" fill="#8fb09a"/><path d="M50 44 v12 M44 50 h12" stroke="#0a0f13" stroke-width="2"/>',
+  chemical: '<circle cx="50" cy="50" r="44" fill="#c8a16d22" stroke="#c8a16d" stroke-width="3.5"/><path d="M42 24 h16 v12 l15 29 c2 4 -1 9 -6 9 H33 c-5 0 -8 -5 -6 -9 l15 -29 v-12 z" fill="#c8a16d1a" stroke="#c8a16d" stroke-width="4" stroke-linejoin="round"/><path d="M30 60 q20 6 40 0 v8 a6 6 0 0 1 -6 6 H36 a6 6 0 0 1 -6 -6 z" fill="#c8a16d" opacity="0.6"/><path d="M45 42 h10" stroke="#c8a16d" stroke-width="3" stroke-linecap="round"/>',
+  electrical: '<circle cx="50" cy="50" r="44" fill="#d2b36e22" stroke="#d2b36e" stroke-width="3.5"/><polygon points="56,22 34,52 51,52 44,78 70,44 52,44" fill="#d2b36e" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>',
+  ergonomic: '<circle cx="50" cy="50" r="44" fill="#9da8b522" stroke="#9da8b5" stroke-width="3.5"/><rect x="35" y="60" width="30" height="24" rx="2" fill="none" stroke="#9da8b5" stroke-width="3.5"/><path d="M35 69 h30" stroke="#9da8b5" stroke-width="2"/><path d="M50 60 v9" stroke="#9da8b5" stroke-width="2"/><circle cx="40" cy="30" r="5.5" fill="#9da8b5"/><path d="M43 36 C40 45 42 53 48 60" fill="none" stroke="#9da8b5" stroke-width="5" stroke-linecap="round"/><path d="M43 40 L50 60" fill="none" stroke="#9da8b5" stroke-width="4" stroke-linecap="round"/><path d="M48 60 L32 68 L26 82" fill="none" stroke="#9da8b5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M60 35 C66 42 66 50 60 58" fill="none" stroke="#c8836f" stroke-width="3" stroke-linecap="round"/><path d="M57 37 L60 33 L63 37" fill="none" stroke="#c8836f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>',
+  fire: '<circle cx="50" cy="50" r="44" fill="#c8836f22" stroke="#c8836f" stroke-width="3.5"/><path d="M50 20 c0 22 -17 27 -17 43 a17 17 0 0 0 34 0 c0 -16 -17 -21 -17 -43 z" fill="#c8836f" opacity="0.85"/><path d="M50 36 c0 11 -8 13 -8 21 a8 8 0 0 0 16 0 c0 -8 -8 -10 -8 -21 z" fill="#f1f3f4" opacity="0.9"/>',
+  physical: '<circle cx="50" cy="50" r="44" fill="#a9a0bf22" stroke="#a9a0bf" stroke-width="3.5"/><path d="M30 50 a20 20 0 0 1 40 0" fill="none" stroke="#a9a0bf" stroke-width="4" stroke-linecap="round"/><path d="M22 40 a32 32 0 0 1 56 0" fill="none" stroke="#a9a0bf" stroke-width="3.5" stroke-linecap="round" opacity="0.7"/><path d="M14 30 a44 44 0 0 1 72 0" fill="none" stroke="#a9a0bf" stroke-width="3" stroke-linecap="round" opacity="0.4"/><circle cx="50" cy="62" r="8" fill="#a9a0bf"/><path d="M42 75 h16" stroke="#a9a0bf" stroke-width="4" stroke-linecap="round"/>',
+  radiation: '<circle cx="50" cy="50" r="44" fill="#b79cbd22" stroke="#b79cbd" stroke-width="3.5"/><circle cx="50" cy="50" r="7" fill="#b79cbd"/><g fill="#b79cbd"><path d="M50 50 m0 -10 a22 22 0 0 1 19 -11 l-3.5 18.5 a12 12 0 0 0 -15.5 -0.5 z" transform="rotate(0 50 50)"/><path d="M50 50 m0 -10 a22 22 0 0 1 19 -11 l-3.5 18.5 a12 12 0 0 0 -15.5 -0.5 z" transform="rotate(120 50 50)"/><path d="M50 50 m0 -10 a22 22 0 0 1 19 -11 l-3.5 18.5 a12 12 0 0 0 -15.5 -0.5 z" transform="rotate(240 50 50)"/></g>',
+  slip: '<circle cx="50" cy="50" r="44" fill="#93aebc22" stroke="#93aebc" stroke-width="3.5"/><path d="M25 78 Q50 70 75 78" fill="none" stroke="#93aebc" stroke-width="4" stroke-linecap="round"/><path d="M38 84 Q50 80 62 84" fill="none" stroke="#93aebc" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/><circle cx="34" cy="34" r="6" fill="#93aebc"/><path d="M38 42 L52 62" fill="none" stroke="#93aebc" stroke-width="6" stroke-linecap="round"/><path d="M42 45 L24 40" fill="none" stroke="#93aebc" stroke-width="4" stroke-linecap="round"/><path d="M45 48 L60 38" fill="none" stroke="#93aebc" stroke-width="4" stroke-linecap="round"/><path d="M52 62 L72 68" fill="none" stroke="#93aebc" stroke-width="5" stroke-linecap="round"/><path d="M52 62 L66 74" fill="none" stroke="#93aebc" stroke-width="4" stroke-linecap="round"/><path d="M68 62 L78 58 M62 55 L70 50" stroke="#93aebc" stroke-width="2.5" stroke-linecap="round"/>'
+};
 
 const CATEGORIES = {
   estrutura: {
@@ -379,7 +394,6 @@ function drawRulers(){
   ctx.fillStyle = "#91a1a9";
   ctx.font = "9px Arial";
 
-  // Régua Horizontal (Topo)
   for(let x = 0; x <= state.room.w; x++){
     const p = worldToScreen(x, 0);
     if(x % 1 === 0){
@@ -393,7 +407,6 @@ function drawRulers(){
     }
   }
 
-  // Régua Vertical (Esquerda)
   for(let y = 0; y <= state.room.h; y++){
     const p = worldToScreen(0, y);
     if(y % 1 === 0){
@@ -407,7 +420,6 @@ function drawRulers(){
     }
   }
   
-  // Reseta alinhamento de texto padrão
   ctx.textAlign = "left";
   ctx.textBaseline = "alphabetic";
 }
@@ -625,27 +637,48 @@ function updateUI(){
   state.objects.forEach(x=>{if(count[x.type]!==undefined)count[x.type]++;});
   $("riskList").innerHTML=RISK_TYPES.filter(t=>count[t]).map(t=>`<div class="risk-row"><span><i class="risk-dot" style="background:${RISK_COLORS[t]}"></i>${TYPES[t][0]}</span><b>${count[t]}</b></div>`).join("") || '<div class="risk-row">Nenhum risco inserido.</div>';
   
-  const c1Valid = state.room.w>=2&&state.room.h>=2;
-  const c2Valid = state.objects.some(o=>o.type==="door"||o.type==="exit");
-  const c3Valid = state.objects.some(o=>["bench","benchL","equipment"].includes(o.type));
-  const c4Valid = state.objects.some(o=>o.type==="zone");
-  const c5Valid = state.objects.some(o=>["shower","eyewash","extinguisher"].includes(o.type));
-  const c6Valid = state.objects.some(o=>RISK_TYPES.includes(o.type));
+  const dimValid = state.room.w >= 3 && state.room.h >= 3 && (state.room.w * state.room.h) >= 12;
+  const exitValid = state.objects.some(o => o.type === "door" || o.type === "exit");
+  const safetyValid = state.objects.some(o => ["shower", "eyewash"].includes(o.type));
+  const fireValid = state.objects.some(o => o.type === "extinguisher");
+  const electricalValid = state.objects.some(o => o.type === "electrical" || o.type === "equipment");
+  const chemicalBioValid = state.objects.some(o => o.type === "chemical" || o.type === "biological");
+  const ventilationValid = state.objects.some(o => o.type === "hood" || o.type === "window");
 
-  $("c1").classList.toggle("ok",c1Valid); $("c1").classList.toggle("checked",c1Valid);
-  $("c2").classList.toggle("ok",c2Valid); $("c2").classList.toggle("checked",c2Valid);
-  $("c3").classList.toggle("ok",c3Valid); $("c3").classList.toggle("checked",c3Valid);
-  $("c4").classList.toggle("ok",c4Valid); $("c4").classList.toggle("checked",c4Valid);
-  $("c5").classList.toggle("ok",c5Valid); $("c5").classList.toggle("checked",c5Valid);
-  $("c6").classList.toggle("ok",c6Valid); $("c6").classList.toggle("checked",c6Valid);
+  const checks = [
+    { id: "check-dim", valid: dimValid },
+    { id: "check-exit", valid: exitValid },
+    { id: "check-safety", valid: safetyValid },
+    { id: "check-fire", valid: fireValid },
+    { id: "check-electrical", valid: electricalValid },
+    { id: "check-chemical-bio", valid: chemicalBioValid },
+    { id: "check-ventilation", valid: ventilationValid }
+  ];
+
+  let validCount = 0;
+  checks.forEach(c => {
+    const el = $(c.id);
+    if (el) {
+      el.classList.toggle("ok", c.valid);
+      el.classList.toggle("checked", c.valid);
+      if (c.valid) validCount++;
+    }
+  });
+
+  const complianceBadge = $("compliance-badge");
+  if (complianceBadge) {
+    complianceBadge.textContent = `${validCount}/7`;
+    complianceBadge.classList.toggle("complete", validCount === 7);
+  }
 }
 
 $("save").onclick=()=>{
-  const data={version:2,date:new Date().toISOString(),room:state.room,objects:state.objects};
+  const data={version:3,date:new Date().toISOString(),room:state.room,objects:state.objects};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mapa-de-riscos-laboratorio.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
 };
 
+// EXPORTAÇÃO SVG CORRIGIDA COM GERENCIAMENTO NATIVO DE POSIÇÃO, ROTAÇÃO E DIRECIONAMENTO
 const exportSvgBtn = $("exportSvg");
 if (exportSvgBtn) {
   exportSvgBtn.onclick = () => {
@@ -667,15 +700,53 @@ if (exportSvgBtn) {
 
       svgContent += `<g transform="translate(${cx}, ${cy}) rotate(${rot}) translate(${-ow / 2}, ${-oh / 2})">`;
 
-      if (RISK_TYPES.includes(o.type)) {
-        svgContent += `<image href="assets/svg/risk-${o.type}.svg" x="0" y="0" width="${ow}" height="${oh}" preserveAspectRatio="xMidYMid meet"/>`;
-      } else if (EQUIPMENT_TYPES.includes(o.type)) {
-        svgContent += `<image href="assets/svg/equipment-${o.type}.svg" x="0" y="0" width="${ow}" height="${oh}" preserveAspectRatio="xMidYMid meet"/>`;
+      if (NATIVE_SVG_TEMPLATES[o.type]) {
+        // Gera o SVG nativamente embutido utilizando o viewBox 100x100 original dimensionado ao objeto
+        svgContent += `<svg viewBox="0 0 100 100" width="${ow}" height="${oh}" x="0" y="0">${NATIVE_SVG_TEMPLATES[o.type]}</svg>`;
       } else if (o.type === "door") {
-        svgContent += `<rect width="${ow}" height="${oh}" fill="#ddd" stroke="#c5a46d" stroke-width="3"/>`;
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#1b2329" stroke="#94a3b8" stroke-width="1.5"/>`;
+        svgContent += `<path d="M0 ${oh} L0 0" stroke="#f8fbfc" stroke-width="2"/>`;
+        svgContent += `<path d="M0 ${oh} A ${ow} ${oh} 0 0 1 ${ow} 0" fill="none" stroke="#fcf8f8" stroke-width="1.5" stroke-dasharray="4, 4"/>`;
       } else if (o.type === "window") {
-        svgContent += `<rect width="${ow}" height="${oh}" fill="#85a5b8" stroke="#dce5e9" stroke-width="1"/>`;
-        svgContent += `<line x1="${ow/2}" y1="0" x2="${ow/2}" y2="${oh}" stroke="#dce5e9" stroke-width="2"/>`;
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#0ea5e922" stroke="#cbd5e1" stroke-width="2"/>`;
+        svgContent += `<line x1="0" y1="${oh/2}" x2="${ow}" y2="${oh/2}" stroke="#38bdf8" stroke-width="1.5"/>`;
+      } else if (o.type === "wall") {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>`;
+      } else if (o.type === "bench") {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#64748b"/>`;
+        svgContent += `<rect width="${ow}" height="${Math.max(3, oh*0.16)}" fill="#94a3b8"/>`;
+        svgContent += `<rect x="${ow*0.04}" y="${oh*0.2}" width="${ow*0.92}" height="${oh*0.72}" fill="#334155"/>`;
+      } else if (o.type === "benchL") {
+        const t = Math.max(10, Math.min(ow, oh) * 0.28);
+        svgContent += `<rect width="${ow}" height="${t}" fill="#64748b"/>`;
+        svgContent += `<rect width="${t}" height="${oh}" fill="#64748b"/>`;
+        svgContent += `<rect width="${ow}" height="${Math.max(3, t*0.15)}" fill="#94a3b8"/>`;
+        svgContent += `<rect width="${Math.max(3, t*0.15)}" height="${oh}" fill="#94a3b8"/>`;
+      } else if (o.type === "sink") {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#94a3b8"/>`;
+        svgContent += `<rect x="${ow*0.12}" y="${oh*0.12}" width="${ow*0.76}" height="${oh*0.76}" rx="4" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>`;
+        svgContent += `<circle cx="${ow/2}" cy="${oh*0.22}" r="${Math.min(ow,oh)*0.08}" fill="#1e293b"/>`;
+      } else if (o.type === "hood") {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#334155"/>`;
+        svgContent += `<rect x="${ow*0.06}" y="${oh*0.12}" width="${ow*0.88}" height="${oh*0.76}" fill="#64748b"/>`;
+        svgContent += `<rect x="${ow*0.1}" y="${oh*0.18}" width="${ow*0.8}" height="${oh*0.55}" fill="#0f172a"/>`;
+        svgContent += `<circle cx="${ow/2}" cy="${oh*0.45}" r="${Math.min(ow,oh)*0.12}" fill="#38bdf8"/>`;
+      } else if (o.type === "cabinet" || o.type === "shelf") {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#475569" stroke="#94a3b8" stroke-width="1.5"/>`;
+        if (o.type === "shelf") {
+          svgContent += `<line x1="0" y1="${oh/2}" x2="${ow}" y2="${oh/2}" stroke="#cbd5e1" stroke-width="1"/>`;
+        } else {
+          svgContent += `<line x1="${ow/2}" y1="0" x2="${ow/2}" y2="${oh}" stroke="#1e293b" stroke-width="1"/>`;
+        }
+      } else if (o.type === "equipment") {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#cbd5e1" stroke="#334155" stroke-width="1.5"/>`;
+        svgContent += `<rect x="${ow*0.12}" y="${oh*0.15}" width="${ow*0.76}" height="${oh*0.3}" fill="#0f172a"/>`;
+        svgContent += `<circle cx="${ow*0.8}" cy="${oh*0.3}" r="${Math.min(ow,oh)*0.06}" fill="#22c55e"/>`;
+      } else if (o.type === "zone") {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="rgba(56, 189, 248, 0.08)" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="6,4"/>`;
+      } else if (o.type === "exit") {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#22c55e" stroke="#14532d" stroke-width="1.5"/>`;
+        svgContent += `<text x="${ow/2}" y="${oh/2}" fill="#ffffff" font-weight="bold" font-size="${Math.max(8, ow*0.28)}" text-anchor="middle" dominant-baseline="middle">SAÍDA</text>`;
       } else {
         svgContent += `<rect width="${ow}" height="${oh}" fill="#6c7880" stroke="#404b52" stroke-width="1"/>`;
       }
