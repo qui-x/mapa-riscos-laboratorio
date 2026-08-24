@@ -251,7 +251,6 @@ function setMode(tool){
 canvas.addEventListener("pointerdown", e => {
   const p={x:e.offsetX,y:e.offsetY};
   
-  // Fecha menus no mobile ao tocar no canvas
   if(window.innerWidth <= 1024){
     const leftPanel = document.querySelector(".left-panel");
     const rightPanel = document.querySelector(".right-panel");
@@ -386,11 +385,63 @@ function updateUI(){
   $("c6").classList.toggle("ok",c6Valid); $("c6").classList.toggle("checked",c6Valid);
 }
 
+// Salvar Projeto (JSON)
 $("save").onclick=()=>{
   const data={version:2,date:new Date().toISOString(),room:state.room,objects:state.objects};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mapa-de-riscos-laboratorio.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
 };
+
+// Exportar para Vetor SVG (Adicionado aqui)
+const exportSvgBtn = $("exportSvg");
+if (exportSvgBtn) {
+  exportSvgBtn.onclick = () => {
+    const scale = 50;
+    const svgW = state.room.w * scale;
+    const svgH = state.room.h * scale;
+
+    let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgW} ${svgH}" width="100%" height="100%">`;
+    svgContent += `<rect width="${svgW}" height="${svgH}" fill="#c6ccd0" stroke="#f1f3f4" stroke-width="8"/>`;
+
+    state.objects.forEach(o => {
+      const ox = o.x * scale;
+      const oy = o.y * scale;
+      const ow = o.w * scale;
+      const oh = o.h * scale;
+      const rot = o.rot || 0;
+      const cx = ox + ow / 2;
+      const cy = oy + oh / 2;
+
+      svgContent += `<g transform="translate(${cx}, ${cy}) rotate(${rot}) translate(${-ow / 2}, ${-oh / 2})">`;
+
+      if (RISK_TYPES.includes(o.type)) {
+        const color = RISK_COLORS[o.type] || "#aebbc2";
+        const r = Math.min(ow, oh) * 0.36;
+        svgContent += `<circle cx="${ow/2}" cy="${oh/2}" r="${r}" fill="${color}33" stroke="${color}" stroke-width="2"/>`;
+        svgContent += `<text x="${ow/2}" y="${oh/2}" font-family="Arial" font-size="${Math.max(10, Math.min(ow, oh)*0.34)}" font-weight="bold" fill="${color}" text-anchor="middle" dominant-baseline="central">${({chemical:"Q",biological:"B",physical:"F",fire:"I",electrical:"E",ergonomic:"G",radiation:"R",slip:"C"})[o.type]||"?"}</text>`;
+      } else if (o.type === "door") {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#ddd" stroke="#c5a46d" stroke-width="3"/>`;
+      } else if (o.type === "window") {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#85a5b8" stroke="#dce5e9" stroke-width="1"/>`;
+        svgContent += `<line x1="${ow/2}" y1="0" x2="${ow/2}" y2="${oh}" stroke="#dce5e9" stroke-width="2"/>`;
+      } else {
+        svgContent += `<rect width="${ow}" height="${oh}" fill="#6c7880" stroke="#404b52" stroke-width="1"/>`;
+      }
+
+      svgContent += `</g>`;
+    });
+
+    svgContent += `</svg>`;
+
+    const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "mapa-de-riscos-laboratorio.svg";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 500);
+  };
+}
+
 $("load").onclick=()=>$("fileInput").click();
 $("fileInput").addEventListener("change",async e=>{
   const f=e.target.files[0];if(!f)return;
