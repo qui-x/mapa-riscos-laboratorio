@@ -454,7 +454,7 @@ if (exportSvgBtn) {
     a.download = "mapa-de-riscos-laboratorio.svg";
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 500);
-  };
+  }
 }
 
 $("load").onclick=()=>$("fileInput").click();
