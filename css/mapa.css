@@ -610,4 +610,44 @@ IDENTIFICADORES DE RISCOS
     display: none;
   }
 }
+  /* =====================================================================
+   CORREÇÃO DE CORES E ESTILO DOS BOTÕES MOBILE NA BARRA DE TOPO
+   ===================================================================== */
+
+.mobile-nav-controls {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .mobile-nav-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Padroniza os botões mobile com o estilo dark do restante da barra */
+  .mobile-only-btn {
+    background: var(--surface-2, #1b2236);
+    border: 1px solid var(--border, #29344d);
+    color: var(--ink, #f0f2f5);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .mobile-only-btn:hover {
+    background: var(--surface-3, #232d47);
+    border-color: var(--primary, #3b82f6);
+  }
+
+  /* Estado ativo opcional para indicar qual painel está aberto */
+  .mobile-only-btn.active-panel {
+    background: var(--primary, #3b82f6);
+    color: #ffffff;
+    border-color: var(--primary, #3b82f6);
+  }
+}
 }
