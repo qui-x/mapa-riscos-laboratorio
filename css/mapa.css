@@ -13,21 +13,79 @@ CORES PADRÃO EM ESCALA DE CINZA
 --sel:#d4a45b;
 --danger:#b87878;
 }
-*{box-sizing:border-box}
-.body{
-  margin:0;background:var(--bg);
-  color:var(--text);
-  font:13px Arial
+*{box-sizing:border-box}/* =====================================================================
+   CORREÇÃO DE MARGENS (REMOVE A BARRA BRANCA) E CABEÇALHO MOBILE
+   ===================================================================== */
+
+/* Remove margens e preenchimentos globais que causam a borda branca */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0a0f13; /* Cor de fundo escura padrão */
 }
-.app{
-  height:100vh;display:flex;flex-direction:column
+
+/* Garante que o container principal ocupe 100% da tela sem folgas */
+.app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
-.topbar{
-    height:62px;flex:0 0 62px;
-    background:#12181d;
-    border-bottom:1px solid var(--line);
-    display:flex;
-    align-items:center;padding:0 18px;gap:28px}
+
+@media (max-width: 760px) {
+  /* Organiza o cabeçalho em linhas para os botões não cortarem */
+  header.topbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px;
+    height: auto;
+  }
+
+  /* Linha exclusiva para centralizar perfeitamente os botões de ferramentas e propriedades */
+  .mobile-nav-controls {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+    order: 2;
+    margin-top: 4px;
+  }
+
+  .mobile-only-btn {
+    flex: 1;
+    text-align: center;
+    background: var(--surface-2, #1b2236);
+    border: 1px solid var(--border, #29344d);
+    color: var(--ink, #f0f2f5);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* Ajusta as ações do topo (salvar/abrir/undo/redo) para a terceira linha */
+  .top-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    order: 3;
+  }
+
+  /* Mantém o espaço do canvas adaptado à altura restante */
+  .workspace {
+    grid-template-columns: 1fr;
+    position: relative;
+    overflow: hidden;
+    height: calc(100dvh - 130px);
+    height: calc(100vh - 130px);
+  }
+}
 /*-----------
 MARCADORES
 --------------*/
