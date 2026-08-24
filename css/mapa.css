@@ -17,7 +17,7 @@ CORES PADRÃO EM ESCALA DE CINZA
 .body{
   margin:0;background:var(--bg);
   color:var(--text);
-  font:13px Inter,system-ui,Arial,sans-serif
+  font:13px Arial
 }
 .app{
   height:100vh;display:flex;flex-direction:column
