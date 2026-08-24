@@ -507,41 +507,61 @@ IDENTIFICADORES DE RISCOS
   .mobile-only {
     display: inline-flex !important;
   }
+/* Botões mobile ocultos por padrão no desktop */
+.mobile-nav-controls {
+  display: none;
+}
 
-  /* Ajusta o cabeçalho para empilhar os elementos sem quebrar */
+@media (max-width: 900px) {
+  header.topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+  .stepper {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .mobile-nav-controls {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+    order: 2;
+  }
+
+  .mobile-only-btn {
+    background: var(--surface-2, #1E2740);
+    border: 1px solid var(--border, #2A3450);
+    color: var(--ink, #EDEFF5);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
   header.topbar {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    padding: 12px 16px;
-    margin-bottom: 10px;
-  }
-
-  .topbar .brand {
-    justify-content: flex-start;
-  }
-
-  .topbar .stepper {
-    display: none; /* Oculta o passo a passo no celular para economizar espaço */
   }
 
   .top-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 6px;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    order: 3;
   }
 
-  /* Transforma o workspace em uma única coluna focada no canvas */
   .workspace {
     grid-template-columns: 1fr;
     position: relative;
     overflow: hidden;
-    height: calc(100dvh - 120px);
-    height: calc(100vh - 120px);
+    height: calc(100dvh - 150px);
+    height: calc(100vh - 150px);
   }
 
-  /* Transforma os painéis esquerdo e direito em gavetas flutuantes */
+  /* Painéis em gaveta flutuante */
   .left-panel, .right-panel {
     position: absolute;
     top: 0;
@@ -567,7 +587,6 @@ IDENTIFICADORES DE RISCOS
     transform: translateX(120%);
   }
 
-  /* Classes ativadas pelo JavaScript para abrir as gavetas */
   .left-panel.open {
     transform: translateX(0);
   }
@@ -576,13 +595,12 @@ IDENTIFICADORES DE RISCOS
     transform: translateX(0);
   }
 
-  /* Reposiciona a barra de ferramentas flutuante do canvas no rodapé */
   .canvas-toolbar {
     top: auto;
-    bottom: 10px;
+    bottom: 12px;
     left: 50%;
     transform: translateX(-50%);
-    width: 90%;
+    width: 92%;
     max-width: 340px;
     justify-content: center;
     flex-wrap: wrap;
@@ -591,4 +609,5 @@ IDENTIFICADORES DE RISCOS
   .canvas-help {
     display: none;
   }
+}
 }
