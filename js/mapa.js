@@ -38,10 +38,9 @@ const state = {
 
 const $ = id => document.getElementById(id);
 const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
-const snap = v => state.snap ? Math.round(v/.1)*.1 : v;
+const snapVal = v => state.snap ? Math.round(v/.1)*.1 : v;
 const num = v => Number.parseFloat(v);
 
-function deepCopyObjects(){ return JSON.parse(JSON.stringify(state.objects)); }
 function pushHistory(){
   state.history.push(JSON.stringify(state.objects));
   if(state.history.length>50) state.history.shift();
@@ -86,8 +85,6 @@ function worldToScreen(x,y){
 function screenToWorld(x,y){
   return {x:(x-canvas.clientWidth/2)/state.cam.zoom+state.cam.x,y:(y-canvas.clientHeight/2)/state.cam.zoom+state.cam.y};
 }
-
-function roomPointInside(x,y){return x>=0&&y>=0&&x<=state.room.w&&y<=state.room.h;}
 
 function normalizeObject(o){
   o.w=Math.max(.05,Math.min(state.room.w,o.w));
@@ -253,6 +250,15 @@ function setMode(tool){
 
 canvas.addEventListener("pointerdown", e => {
   const p={x:e.offsetX,y:e.offsetY};
+  
+  // Fecha menus no mobile ao tocar no canvas
+  if(window.innerWidth <= 1024){
+    const leftPanel = document.querySelector(".left-panel");
+    const rightPanel = document.querySelector(".right-panel");
+    if(leftPanel) leftPanel.classList.remove("open");
+    if(rightPanel) rightPanel.classList.remove("open");
+  }
+
   if(state.tool==="pan" || e.button===1){
     state.pan=true; state.last=p;
   } else {
@@ -276,8 +282,8 @@ canvas.addEventListener("pointermove",e=>{
     state.last=p; draw();
   } else if(state.drag){
     const q=screenToWorld(p.x,p.y);
-    state.drag.o.x=snap(q.x-state.drag.dx);
-    state.drag.o.y=snap(q.y-state.drag.dy);
+    state.drag.o.x=snapVal(q.x-state.drag.dx);
+    state.drag.o.y=snapVal(q.y-state.drag.dy);
     normalizeObject(state.drag.o);
     updateUI(); draw();
   }
@@ -330,18 +336,7 @@ $("applyProps").onclick=()=>{
   pushHistory();Object.assign(state.selected,vals);normalizeObject(state.selected);updateUI();draw();
 };
 
-// --- CONTROLES DOS PAINÉIS MOBILE (ÚNICO E CONSOLIDADO) ---
-const topActionsBar = document.querySelector(".top-actions") || document.querySelector(".topbar");
-if (topActionsBar && !document.getElementById("btnToggleTools")) {
-  const mobileNavHTML = `
-    <div class="mobile-nav-controls">
-      <button id="btnToggleTools" class="mobile-only-btn" title="Ferramentas">Ferramentas</button>
-      <button id="btnToggleProps" class="mobile-only-btn" title="Propriedades">Propriedades</button>
-    </div>
-  `;
-  topActionsBar.insertAdjacentHTML("afterbegin", mobileNavHTML);
-}
-
+// --- CONTROLES DOS PAINÉIS MOBILE/TABLET ---
 const btnToggleTools = document.getElementById("btnToggleTools");
 const btnToggleProps = document.getElementById("btnToggleProps");
 const leftPanelElem = document.querySelector(".left-panel");
@@ -367,16 +362,6 @@ if (btnToggleProps && rightPanelElem) {
   });
 }
 
-// Fecha as gavetas ao clicar no canvas em telas menores
-canvas.addEventListener("pointerdown", () => {
-  if (window.innerWidth <= 760) {
-    if (leftPanelElem) leftPanelElem.classList.remove("open");
-    if (rightPanelElem) rightPanelElem.classList.remove("open");
-    if (btnToggleTools) btnToggleTools.classList.remove("active-panel");
-    if (btnToggleProps) btnToggleProps.classList.remove("active-panel");
-  }
-});
-
 function updateUI(){
   const o=state.selected;
   $("title").textContent=o?(TYPES[o.type]?.[0]||o.type):"Nenhum elemento";
@@ -385,12 +370,20 @@ function updateUI(){
   if(o){$("x").value=o.x.toFixed(2);$("y").value=o.y.toFixed(2);$("w").value=o.w.toFixed(2);$("h").value=o.h.toFixed(2);$("rot").value=o.rot;$("rotVal").textContent=o.rot+"°";}
   const count={};RISK_TYPES.forEach(t=>count[t]=0);state.objects.forEach(x=>{if(count[x.type]!==undefined)count[x.type]++;});
   $("riskList").innerHTML=RISK_TYPES.filter(t=>count[t]).map(t=>`<div class="risk-row"><span><i class="risk-dot" style="background:${RISK_COLORS[t]}"></i>${TYPES[t][0]}</span><b>${count[t]}</b></div>`).join("") || '<div class="risk-row">Nenhum risco inserido.</div>';
-  $("c1").classList.toggle("ok",state.room.w>=2&&state.room.h>=2);
-  $("c2").classList.toggle("ok",state.objects.some(o=>o.type==="door"||o.type==="exit"));
-  $("c3").classList.toggle("ok",state.objects.some(o=>["bench","benchL","equipment"].includes(o.type)));
-  $("c4").classList.toggle("ok",state.objects.some(o=>o.type==="zone"));
-  $("c5").classList.toggle("ok",state.objects.some(o=>["shower","eyewash","extinguisher"].includes(o.type)));
-  $("c6").classList.toggle("ok",state.objects.some(o=>RISK_TYPES.includes(o.type)));
+  
+  const c1Valid = state.room.w>=2&&state.room.h>=2;
+  const c2Valid = state.objects.some(o=>o.type==="door"||o.type==="exit");
+  const c3Valid = state.objects.some(o=>["bench","benchL","equipment"].includes(o.type));
+  const c4Valid = state.objects.some(o=>o.type==="zone");
+  const c5Valid = state.objects.some(o=>["shower","eyewash","extinguisher"].includes(o.type));
+  const c6Valid = state.objects.some(o=>RISK_TYPES.includes(o.type));
+
+  $("c1").classList.toggle("ok",c1Valid); $("c1").classList.toggle("checked",c1Valid);
+  $("c2").classList.toggle("ok",c2Valid); $("c2").classList.toggle("checked",c2Valid);
+  $("c3").classList.toggle("ok",c3Valid); $("c3").classList.toggle("checked",c3Valid);
+  $("c4").classList.toggle("ok",c4Valid); $("c4").classList.toggle("checked",c4Valid);
+  $("c5").classList.toggle("ok",c5Valid); $("c5").classList.toggle("checked",c5Valid);
+  $("c6").classList.toggle("ok",c6Valid); $("c6").classList.toggle("checked",c6Valid);
 }
 
 $("save").onclick=()=>{
