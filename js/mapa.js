@@ -389,6 +389,41 @@ if (canvasEl) {
     }
   });
 }
+  // --- CONTROLES DOS PAINÉIS MOBILE ---
+const btnToggleTools = document.getElementById("btnToggleTools");
+const btnToggleProps = document.getElementById("btnToggleProps");
+const leftPanelElem = document.querySelector(".left-panel");
+const rightPanelElem = document.querySelector(".right-panel");
+
+if (btnToggleTools && leftPanelElem) {
+  btnToggleTools.addEventListener("click", (e) => {
+    e.stopPropagation();
+    leftPanelElem.classList.toggle("open");
+    if (rightPanelElem) rightPanelElem.classList.remove("open");
+    btnToggleTools.classList.toggle("active-panel", leftPanelElem.classList.contains("open"));
+    if (btnToggleProps) btnToggleProps.classList.remove("active-panel");
+  });
+}
+
+if (btnToggleProps && rightPanelElem) {
+  btnToggleProps.addEventListener("click", (e) => {
+    e.stopPropagation();
+    rightPanelElem.classList.toggle("open");
+    if (leftPanelElem) leftPanelElem.classList.remove("open");
+    btnToggleProps.classList.toggle("active-panel", rightPanelElem.classList.contains("open"));
+    if (btnToggleTools) btnToggleTools.classList.remove("active-panel");
+  });
+}
+
+// Fecha as gavetas ao clicar no canvas em telas menores
+canvas.addEventListener("pointerdown", () => {
+  if (window.innerWidth <= 760) {
+    if (leftPanelElem) leftPanelElem.classList.remove("open");
+    if (rightPanelElem) rightPanelElem.classList.remove("open");
+    if (btnToggleTools) btnToggleTools.classList.remove("active-panel");
+    if (btnToggleProps) btnToggleProps.classList.remove("active-panel");
+  }
+});
 function updateUI(){
   const o=state.selected;
   $("title").textContent=o?(TYPES[o.type]?.[0]||o.type):"Nenhum elemento";
