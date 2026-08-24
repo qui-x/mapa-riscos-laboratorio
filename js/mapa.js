@@ -392,10 +392,12 @@ $("save").onclick=()=>{
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mapa-de-riscos-laboratorio.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
 };
 
-// Exportar para Vetor SVG (Adicionado aqui)
+// Exportar para Vetor SVG (Com verificação de erro)
 const exportSvgBtn = $("exportSvg");
 if (exportSvgBtn) {
   exportSvgBtn.onclick = () => {
+    console.log("Botão SVG clicado com sucesso!"); // Aparecerá no F12 do navegador
+    
     const scale = 50;
     const svgW = state.room.w * scale;
     const svgH = state.room.h * scale;
@@ -430,6 +432,19 @@ if (exportSvgBtn) {
 
       svgContent += `</g>`;
     });
+
+    svgContent += `</svg>`;
+
+    const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "mapa-de-riscos-laboratorio.svg";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 500);
+  };
+} else {
+  console.error("ERRO: O elemento com id 'exportSvg' não foi encontrado no HTML!");
+}
 
     svgContent += `</svg>`;
 
