@@ -3,7 +3,7 @@
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-
+ 
 const TYPES = {
   wall:["Parede",2.4,.12],
   door:["Porta",.9,.12],
