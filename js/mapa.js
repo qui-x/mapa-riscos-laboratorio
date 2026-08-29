@@ -151,11 +151,10 @@ function on(id, event, handler, options) {
   return el;
 }
 const ROOM_SESSION_KEY = "mapa_riscos_room_session";
-const USER_KEY = "mapa_riscos_local_current_user_v1";
 const canEdit = () => state.role !== "student";
 
 /** Retorna se existe uma sessão local autenticada. */
-function isAuthenticated() { return Boolean(state.user?.id); }
+function isAuthenticated() { return Boolean(state.user?.id && localStorage.getItem("mapa_riscos_session_token")); }
 /** Atualiza a interface conforme o usuário autenticado e o modo da sala. */
 function applyAuthUI() {
   const authenticated = isAuthenticated();
@@ -263,7 +262,7 @@ async function loadUserRooms() {
 async function enterListedRoom(code) { if (!isAuthenticated()) return; setLoginLoading(true, "Entrando na sala…"); showGlobalLoader(true, "Entrando na sala…"); try { const data = await apiRequest("/api/sala/entrar", { method: "POST", body: JSON.stringify({codigo:code}) }); await enterRoomFromServer(data.sala, data.sala.papel); } catch (err) { showToast(err.message || "Não foi possível entrar na sala. Verifique o código e tente novamente.", "error"); } finally { setLoginLoading(false); showGlobalLoader(false); } }
 
 /** Encerra a sessão local. */
-async function logoutUser() { state.user = null; clearRoomSession(); AuthAPI.logoutUser(); applySessionUI(); applyAuthUI(); showLoginScreen(); }
+async function logoutUser() { state.user = null; clearRoomSession(); AuthAPI.logoutUser().catch(() => {}); applySessionUI(); applyAuthUI(); showLoginScreen(); }
 
 /**
  * Mostra ou oculta o estado de carregamento da tela de login.
@@ -297,8 +296,8 @@ function setLoginRole(role) {
  * Wrapper do cliente que encaminha requisições para o módulo de comunicação com o backend.
  */
 async function apiRequest(path, options = {}) {
-  if (window.LocalRoomBackend?.request) return window.LocalRoomBackend.request(path, options);
-  throw new Error("Backend local indisponível.");
+  if (window.RoomBackend?.request) return window.RoomBackend.request(path, options);
+  throw new Error("Backend GAS indisponível. Verifique js/config.js e a URL /exec.");
 }
 /**
  * Salva no armazenamento local os dados mínimos da sessão da sala.
@@ -340,7 +339,7 @@ let roomSocket = null;
  */
 async function syncRoomProject() {
   if (state.role !== "professor" || !state.roomCode || !state.roomToken) return;
-  try { await apiRequest("/api/sala/salvar", { method:"POST", body:JSON.stringify({codigo:state.roomCode, projeto:sanitizeProjectForSync()}) }); } catch (err) { console.warn("Não foi possível salvar a sala local", err); }
+  try { await apiRequest("/api/sala/salvar", { method:"POST", body:JSON.stringify({codigo:state.roomCode, projeto:sanitizeProjectForSync()}) }); } catch (err) { console.warn("Não foi possível salvar a sala no GAS", err); }
 }
 /**
  * Agenda uma nova sincronização evitando chamadas repetitivas a cada pequena alteração.
@@ -3182,7 +3181,7 @@ window.addEventListener("keydown", e => {
 /** Restaura a sessão local salva no navegador. */
 async function bootstrapLocalSession() {
   const user = AuthAPI.getCurrentUser();
-  if (!user) return false;
+  if (!user || !localStorage.getItem("mapa_riscos_session_token")) return false;
   state.user = user; applyAuthUI();
   return true;
 }

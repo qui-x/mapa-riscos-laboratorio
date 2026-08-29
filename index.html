@@ -53,6 +53,7 @@
           <span><strong>Entrar</strong><small id="authSubmitHint">Usar minha conta</small></span>
         </button>
         <button id="toggleRegister" class="login-secondary-action" type="button">Criar conta</button>
+      <button id="forgotPasswordLink" class="login-secondary-action login-forgot-link" type="button">Esqueci minha senha</button>
       </form>
 
       <div id="loginError" class="login-feedback hidden" role="alert" aria-live="assertive"></div>
@@ -81,6 +82,39 @@
           <h2>Acesso do estudante</h2>
           <p>Informe o código da sala para entrar em modo somente leitura.</p>
         </div>
+      </section>
+
+
+      <!-- Painel de recuperação de senha: envia link de redefinição por e-mail. -->
+      <section id="forgotPasswordPanel" class="login-panel hidden" aria-labelledby="forgotPasswordTitle">
+        <div class="login-panel-head">
+          <h2 id="forgotPasswordTitle">Recuperar senha</h2>
+          <p>Informe o e-mail cadastrado para receber um link de redefinição.</p>
+        </div>
+        <form id="forgotPasswordForm" class="login-form" novalidate>
+          <label for="forgotEmail">E-mail cadastrado</label>
+          <input id="forgotEmail" type="email" autocomplete="email" placeholder="seu@email.com" aria-label="E-mail cadastrado para recuperação">
+          <button id="forgotSubmit" class="login-primary-action" type="submit"><span class="login-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 6h18v12H3zM3 7l9 7 9-7"></path></svg></span><span><strong>Enviar link</strong><small>Você receberá instruções por e-mail</small></span></button>
+        </form>
+        <p id="forgotMessage" class="feedback" role="status" aria-live="polite"></p>
+        <button id="backToLogin" class="login-secondary-action" type="button">Voltar ao login</button>
+      </section>
+
+      <!-- Painel de redefinição: exibido quando resetToken e email vêm na URL. -->
+      <section id="resetPasswordPanel" class="login-panel hidden" aria-labelledby="resetPasswordTitle">
+        <div class="login-panel-head">
+          <h2 id="resetPasswordTitle">Definir nova senha</h2>
+          <p>Crie uma nova senha com pelo menos 6 caracteres.</p>
+        </div>
+        <form id="resetPasswordForm" class="login-form" novalidate>
+          <label for="resetPassword">Nova senha</label>
+          <input id="resetPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Mínimo de 6 caracteres" aria-label="Nova senha">
+          <label for="resetPasswordConfirm">Confirmar senha</label>
+          <input id="resetPasswordConfirm" type="password" minlength="6" autocomplete="new-password" placeholder="Digite novamente" aria-label="Confirmar nova senha">
+          <button id="resetSubmit" class="login-primary-action" type="submit"><span class="login-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span><span><strong>Redefinir senha</strong><small>Atualizar acesso da conta</small></span></button>
+        </form>
+        <p id="resetMessage" class="feedback" role="status" aria-live="polite"></p>
+        <button id="resetBackLogin" class="login-secondary-action" type="button">Voltar ao login</button>
       </section>
 
       <div class="login-note">As contas deste modo demonstrativo ficam armazenadas apenas neste navegador.</div>

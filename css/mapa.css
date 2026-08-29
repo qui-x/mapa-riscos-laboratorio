@@ -2256,3 +2256,8 @@ summary:focus-visible {
   .stepper-hint { padding:0 10px; }
   .left-panel, .right-panel { padding:14px; }
 }
+/* FRENTE 42 — recuperação de senha no login. */
+.login-forgot-link{border-color:transparent;background:transparent;color:var(--accent);min-height:32px;font-size:11px}
+.login-forgot-link:hover{background:rgba(31,211,232,.06);border-color:rgba(31,211,232,.22)}
+.feedback{min-height:18px;margin:10px 0;color:var(--muted);font-size:11px;line-height:1.45}
+#forgotPasswordPanel,#resetPasswordPanel{margin-top:12px}

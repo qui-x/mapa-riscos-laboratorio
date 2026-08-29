@@ -120,3 +120,9 @@ Esta versão usa contas locais em `localStorage`, sem Google Identity Services. 
 
 Professores podem criar salas locais de 6 caracteres e estudantes podem entrar nelas no mesmo navegador/dispositivo. Para salas compartilhadas entre dispositivos, é necessário conectar novamente um backend de salas.
 
+
+## Autenticação remota por e-mail e senha
+
+A autenticação atual usa Google Apps Script + Google Sheets, sem Google Identity Services. O frontend usa `js/auth.js` para cadastro, login, logout, recuperação e redefinição de senha; `js/room-gas.js` faz a comunicação com o Web App. Execute `setupMasterSpreadsheet()` no GAS antes de publicar.
+
+A aba `usuarios` deve conter: `id`, `email`, `nome`, `foto`, `papel`, `senhaHash`, `senhaSalt`, `resetToken`, `resetExpira`, `criadoEm`, `ultimoAcesso`.
