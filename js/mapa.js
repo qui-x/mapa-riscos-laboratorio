@@ -181,9 +181,58 @@ function syncAuthFormUI() {
 let loginUiRole = "professor";
 let loginUiMode = "login";
 
+/** Exibe ou oculta o carregamento global durante operações assíncronas. */
+function showGlobalLoader(show, message = "Carregando…") {
+  const overlay = $("globalLoader");
+  if (!overlay) return;
+  const label = $("globalLoaderText");
+  if (label) label.textContent = message;
+  overlay.classList.toggle("hidden", !show);
+  overlay.setAttribute("aria-hidden", String(!show));
+}
+
+/** Aplica feedback de validade em um campo de formulário. */
+function setFieldValidity(id, valid, message = "") {
+  const el = $(id);
+  if (!el) return valid;
+  el.classList.toggle("is-invalid", !valid);
+  el.setAttribute("aria-invalid", String(!valid));
+  let help = $(id + "Feedback");
+  if (message) {
+    if (!help) {
+      help = document.createElement("small");
+      help.id = id + "Feedback";
+      help.className = "field-feedback";
+      el.insertAdjacentElement("afterend", help);
+    }
+    help.textContent = message;
+  } else if (help) { help.remove(); }
+  return valid;
+}
+
+/** Valida os campos de autenticação em tempo real ou no envio do formulário. */
+function validateAuthForm(showMessage = false) {
+  const email = ($("authEmail")?.value || "").trim();
+  const senha = $("authPassword")?.value || "";
+  const nome = ($("authName")?.value || "").trim();
+  const code = ($("studentRoomCodeAuth")?.value || "").trim();
+  let ok = true;
+  ok = setFieldValidity("authEmail", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), email || !showMessage ? "" : "Informe um email válido.") && ok;
+  ok = setFieldValidity("authPassword", senha.length >= 6, senha || !showMessage ? "" : "A senha deve ter pelo menos 6 caracteres.") && ok;
+  if (loginUiMode === "register") ok = setFieldValidity("authName", nome.length >= 2, nome || !showMessage ? "" : "Informe seu nome completo.") && ok;
+  else setFieldValidity("authName", true, "");
+  if (loginUiRole === "estudante" && loginUiMode === "login" && code) {
+    ok = setFieldValidity("studentRoomCodeAuth", /^[A-Z0-9]{6}$/.test(code), "Digite um código de 6 caracteres.") && ok;
+  } else setFieldValidity("studentRoomCodeAuth", true, "");
+  return ok;
+}
+
 /** Processa o login ou cadastro local conforme o modo atual. */
 async function submitAuthForm(e) {
-  e.preventDefault(); setLoginError(""); setLoginLoading(true, loginUiMode === "register" ? "Criando conta…" : "Entrando…");
+  e.preventDefault();
+  if (!validateAuthForm(true)) return;
+  setLoginError(""); setLoginLoading(true, loginUiMode === "register" ? "Criando conta…" : "Entrando…");
+  showGlobalLoader(true, loginUiMode === "register" ? "Criando conta…" : "Entrando…");
   try {
     const nome = $("authName")?.value || ""; const email = $("authEmail")?.value || ""; const senha = $("authPassword")?.value || "";
     const user = loginUiMode === "register" ? await AuthAPI.registerUser(nome, email, senha, loginUiRole) : await AuthAPI.loginUser(email, senha, loginUiRole);
@@ -194,8 +243,8 @@ async function submitAuthForm(e) {
       return;
     }
     showHomeScreen(); showToast(`Acesso realizado como ${user.nome}`, "success");
-  } catch (err) { setLoginError(err.message || "Não foi possível autenticar."); }
-  finally { setLoginLoading(false); }
+  } catch (err) { setLoginError(err.message || "Não foi possível concluir o acesso. Verifique os dados informados e tente novamente."); }
+  finally { setLoginLoading(false); showGlobalLoader(false); }
 }
 
 /** Carrega as salas locais vinculadas ao usuário autenticado. */
@@ -205,13 +254,13 @@ async function loadUserRooms() {
   const rooms = Array.isArray(result.salas) ? result.salas : []; const section = $("userRoomsSection"), list = $("userRoomsList");
   if (!section || !list) return rooms;
   section.hidden = false;
-  list.innerHTML = rooms.length ? rooms.map(room => { const code = escapeHtml(room.codigo); return `<div class="room-list-item"><div><strong>Sala ${code}</strong><small>${room.papel === "professor" ? "Professor" : "Estudante"} · ${room.status === "ativa" ? "Ativa" : "Encerrada"} · ${room.participantes || 0} participante(s)</small></div><button type="button" class="room-enter-btn" data-room-code="${code}" ${room.status === "ativa" ? "" : "disabled"}>Entrar</button></div>`; }).join("") : '<span class="recent-empty">Nenhuma sala vinculada a esta conta.</span>';
+  list.innerHTML = rooms.length ? rooms.map(room => { const code = escapeHtml(room.codigo); return `<div class="room-list-item"><div><strong>Sala ${code}</strong><small>${room.papel === "professor" ? "Professor" : "Estudante"} · <span class="room-status-${room.status === "ativa" ? "active" : "inactive"}">${room.status === "ativa" ? "Ativa" : "Encerrada"}</span> · ${room.participantes || 0} participante(s)</small></div><button type="button" class="room-enter-btn" data-room-code="${code}" ${room.status === "ativa" ? "" : "disabled"}>Entrar</button></div>`; }).join("") : '<span class="recent-empty">Nenhuma sala vinculada a esta conta.</span>';
   list.querySelectorAll(".room-enter-btn").forEach(btn => btn.addEventListener("click", () => enterListedRoom(btn.dataset.roomCode)));
   return rooms;
 }
 
 /** Entra em uma sala escolhida na Home. */
-async function enterListedRoom(code) { if (!isAuthenticated()) return; setLoginLoading(true, "Entrando na sala…"); try { const data = await apiRequest("/api/sala/entrar", { method: "POST", body: JSON.stringify({codigo:code}) }); await enterRoomFromServer(data.sala, data.sala.papel); } catch (err) { showToast(err.message, "error"); } finally { setLoginLoading(false); } }
+async function enterListedRoom(code) { if (!isAuthenticated()) return; setLoginLoading(true, "Entrando na sala…"); showGlobalLoader(true, "Entrando na sala…"); try { const data = await apiRequest("/api/sala/entrar", { method: "POST", body: JSON.stringify({codigo:code}) }); await enterRoomFromServer(data.sala, data.sala.papel); } catch (err) { showToast(err.message || "Não foi possível entrar na sala. Verifique o código e tente novamente.", "error"); } finally { setLoginLoading(false); showGlobalLoader(false); } }
 
 /** Encerra a sessão local. */
 async function logoutUser() { state.user = null; clearRoomSession(); AuthAPI.logoutUser(); applySessionUI(); applyAuthUI(); showLoginScreen(); }
@@ -248,33 +297,8 @@ function setLoginRole(role) {
  * Wrapper do cliente que encaminha requisições para o módulo de comunicação com o backend.
  */
 async function apiRequest(path, options = {}) {
-  const gasUrl = window.APP_CONFIG?.GAS_URL || "";
-  if (!gasUrl) throw new Error("Backend GAS não configurado.");
-  const routeMap = {
-    "/api/auth/login": "authLogin",
-    "/api/auth/register": "authRegister",
-    "/api/auth/logout": "authLogout",
-    "/api/sala/criar": "criar",
-    "/api/sala/entrar": "entrar",
-    "/api/sala/salvar": "salvar",
-    "/api/sala/encerrar": "encerrar",
-    "/api/usuario/salas": "usuarioSalas",
-    "/api/sala/participantes": "participantes",
-    "/api/sinalizacao/enviar": "enviarSinal"
-  };
-  let action = routeMap[path];
-  if (!action && path.startsWith("/api/sala/status/")) action = "status";
-  if (!action) throw new Error(`Endpoint não suportado: ${path}`);
-  const body = options.body ? JSON.parse(options.body) : {};
-  body.action = action;
-  if (action === "status") body.codigo = decodeURIComponent(path.slice("/api/sala/status/".length));
-  const sessionToken = localStorage.getItem("mapa_riscos_remote_session_v1");
-  if (sessionToken) body.sessionToken = sessionToken;
-  const response = await fetch(gasUrl, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) });
-  if (!response.ok) throw new Error(`Erro de comunicação com o backend (${response.status}).`);
-  const data = await response.json();
-  if (!data?.ok) throw new Error(data?.error || "Operação não concluída.");
-  return data;
+  if (window.LocalRoomBackend?.request) return window.LocalRoomBackend.request(path, options);
+  throw new Error("Backend local indisponível.");
 }
 /**
  * Salva no armazenamento local os dados mínimos da sessão da sala.
@@ -359,10 +383,10 @@ async function enterRoomFromServer(sala, role) {
 async function createRoomFromLogin() {
   if (!isAuthenticated()) { setLoginError("Faça login antes de criar uma sala."); return; }
   if (state.user.papel !== "professor") { setLoginError("Sua conta não está cadastrada como professor."); return; }
-  setLoginError(""); setLoginLoading(true, "Criando sala…");
+  setLoginError(""); setLoginLoading(true, "Criando sala…"); showGlobalLoader(true, "Criando sala…");
   try { const data = await apiRequest("/api/sala/criar", { method:"POST", body:JSON.stringify({}) }); if (!data?.sala?.codigo) throw new Error("Não foi possível criar a sala."); await enterRoomFromServer(data.sala, "professor"); showToast(`Sala criada. Código: ${data.sala.codigo}`, "success"); }
   catch (err) { console.error("ERRO na criação da sala:", err); setLoginError(err.message || "Não foi possível criar a sala."); }
-  finally { setLoginLoading(false); }
+  finally { setLoginLoading(false); showGlobalLoader(false); }
 }
 /**
  * Valida o código informado e entra na sala com o papel solicitado.
@@ -372,7 +396,7 @@ async function joinRoomFromLogin(code, professorAttempt=false) {
   if (professorAttempt && state.user.papel !== "professor") { setLoginError("Apenas a conta de professor pode retomar uma sala como proprietária."); return; }
   const normalized = String(code || "").trim().toUpperCase();
   if (!/^[A-Z0-9]{6}$/.test(normalized)) { setLoginError("Digite um código de 6 caracteres."); return; }
-  setLoginError(""); setLoginLoading(true, "Verificando sala…");
+  setLoginError(""); setLoginLoading(true, "Verificando sala…"); showGlobalLoader(true, "Verificando sala…");
   try {
     const data = await apiRequest("/api/sala/entrar", { method:"POST", body:JSON.stringify({codigo:normalized}) });
     await enterRoomFromServer(data.sala, data.sala.papel);
@@ -456,13 +480,25 @@ function showToast(msg, type = "info") {
   if (!container) return;
   const toast = document.createElement("div");
   toast.className = `toast toast-${type}`;
-  toast.textContent = msg;
+  const icon = document.createElement("span");
+  icon.className = "toast-icon";
+  icon.setAttribute("aria-hidden", "true");
+  const svg = type === "success"
+    ? '<svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg>'
+    : type === "error"
+      ? '<svg viewBox="0 0 24 24"><path d="M12 8v5M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>'
+      : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 10v6M12 7h.01"/></svg>';
+  icon.innerHTML = svg;
+  const text = document.createElement("span");
+  text.textContent = msg;
+  toast.append(icon, text);
   container.appendChild(toast);
   setTimeout(() => {
     toast.style.opacity = "0";
-    toast.style.transition = "opacity 0.3s";
-    setTimeout(() => toast.remove(), 300);
-  }, 2500);
+    toast.style.transform = "translateY(6px)";
+    toast.style.transition = "opacity 0.2s ease, transform 0.2s ease";
+    setTimeout(() => toast.remove(), 220);
+  }, 2800);
 }
 
 // --- HISTÓRICO UNDO / REDO ---
@@ -918,7 +954,7 @@ function drawObject(o) {
 
   if (!val.valid) {
     ctx.strokeStyle = "#ef4444";
-    ctx.lineWidth = Math.max(2, Math.min(3, state.cam.zoom * 0.05));
+    ctx.lineWidth = Math.max(3, Math.min(5, state.cam.zoom * 0.07));
     ctx.strokeRect(-2, -2, w + 4, h + 4);
   }
 
@@ -1344,7 +1380,8 @@ function drawMarquee() {
 function drawDimensionTooltip(o) {
   if (!state.drag && !state.ruler) return;
   const p = worldToScreen(o.x + o.w / 2, o.y);
-  const text = `${o.w.toFixed(2)} × ${o.h.toFixed(2)} m (${Math.round(o.rot || 0)}°)`;
+  const area = Math.abs(o.w * o.h);
+  const text = `${o.w.toFixed(2)} × ${o.h.toFixed(2)} m | ${Math.round(o.rot || 0)}° | ${area.toFixed(2)} m²`;
 
   ctx.save();
   ctx.font = "11px system-ui, -apple-system, sans-serif";
@@ -1871,6 +1908,13 @@ function updateStepper() {
   if (!hasStructural && !hasRisk && !allChecksOk) {
     setStepState(step1, "active");
   }
+  const hint = $("stepperHint");
+  if (hint) {
+    hint.textContent = !hasStructural ? "Comece definindo o ambiente e adicionando estrutura."
+      : !hasRisk ? "Adicione pelo menos um risco ao mapa."
+      : !allChecksOk ? "Revise os critérios de conformidade para concluir."
+      : "Mapa revisado: todos os 10 critérios estão conformes.";
+  }
 }
 
 /**
@@ -2348,6 +2392,12 @@ function focusStepTarget(stepId) {
 
 document.querySelectorAll(".step").forEach(step => {
   step.addEventListener("click", () => focusStepTarget(step.id));
+});
+document.querySelectorAll("button").forEach(btn => {
+  if (!btn.getAttribute("aria-label") && btn.querySelector("svg") && !(btn.textContent || "").trim()) {
+    const title = btn.getAttribute("title");
+    if (title) btn.setAttribute("aria-label", title);
+  }
 });
 $("openComplianceReport")?.addEventListener("click", openComplianceReport);
 $("btnCloseComplianceReport")?.addEventListener("click", closeComplianceReport);
@@ -3132,8 +3182,7 @@ window.addEventListener("keydown", e => {
 /** Restaura a sessão local salva no navegador. */
 async function bootstrapLocalSession() {
   const user = AuthAPI.getCurrentUser();
-  const token = localStorage.getItem("mapa_riscos_remote_session_v1");
-  if (!user || !token) return false;
+  if (!user) return false;
   state.user = user; applyAuthUI();
   return true;
 }
@@ -3178,6 +3227,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 $("loginRoleProfessor")?.addEventListener("click", () => { loginUiRole = "professor"; loginUiMode = "login"; setLoginRole("professor"); syncAuthFormUI(); });
 $("loginRoleStudent")?.addEventListener("click", () => { loginUiRole = "estudante"; loginUiMode = "login"; setLoginRole("student"); syncAuthFormUI(); });
 $("authForm")?.addEventListener("submit", submitAuthForm);
+["authName","authEmail","authPassword","studentRoomCodeAuth"].forEach(id => $(id)?.addEventListener("input", () => validateAuthForm(false)));
 $("toggleRegister")?.addEventListener("click", () => { loginUiMode = loginUiMode === "register" ? "login" : "register"; syncAuthFormUI(); setLoginError(""); });
 $("createRoomBtn")?.addEventListener("click", createRoomFromLogin);
 $("homeLogoutBtn")?.addEventListener("click", logoutUser);

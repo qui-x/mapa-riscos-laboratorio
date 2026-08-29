@@ -201,7 +201,7 @@
           <b>Conferir</b>
           <span class="step-check" aria-hidden="true">✓</span>
         </button>
-      </div>
+      </div><div id="stepperHint" class="stepper-hint" aria-live="polite">Comece definindo o ambiente e adicionando estrutura.</div>
 
       <div><div class="top-action-group top-action-edit"><button id="undo" title="Desfazer (Ctrl+Z)" aria-label="Desfazer ação anterior (Ctrl+Z)">
           <svg viewbox="0 0 24 24"><path d="M3 7v6h6M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
@@ -550,6 +550,14 @@
   </div>
 
   <!-- Configuração global e URL do backend. -->
+  <!-- Carregamento global para operações assíncronas. -->
+  <div id="globalLoader" class="global-loader hidden" aria-hidden="true" role="status" aria-live="polite">
+    <div class="global-loader-card">
+      <span class="global-spinner" aria-hidden="true"></span>
+      <span id="globalLoaderText">Carregando…</span>
+    </div>
+  </div>
+
   <script defer src="js/config.js"></script>
   <!-- Constantes, tipos, riscos, EPI e modelos. -->
   <script defer src="js/types.js"></script>

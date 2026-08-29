@@ -2166,3 +2166,93 @@ body.role-student .auth-room-panel#loginProfessorPanel { display: none; }
 /* Ações agrupadas da seção de salas na Home. */
 .home-recent-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
 @media (max-width:620px) { .home-recent-actions { width:100%; justify-content:stretch; } .home-recent-actions .home-continue { flex:1; } }
+
+/* FRENTE 41 — acessibilidade, contraste, feedback e responsividade. */
+:root {
+  --muted: #c2d2dc;
+  --text: #f0f4f8;
+}
+
+/* Estados globais de interação dos controles. */
+button {
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease, transform .12s ease, opacity .16s ease, box-shadow .16s ease;
+}
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Formulário de autenticação: campos com feedback inline. */
+.login-form input { text-transform: none; letter-spacing: normal; font-family: inherit; }
+.login-form input.is-invalid { border-color: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,.14); }
+.field-feedback { display:block; margin:5px 2px 0; color:#fca5a5; font-size:10px; line-height:1.4; }
+
+/* Toasts com hierarquia visual e animação de entrada/saída. */
+.toast { display:flex; align-items:flex-start; gap:9px; border-left:4px solid transparent; animation:toast-in .18s ease-out; }
+.toast-icon { width:18px; height:18px; flex:0 0 18px; display:grid; place-items:center; }
+.toast-icon svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.toast-success { border-left-color:#22c55e; }
+.toast-error { border-left-color:#ef4444; }
+.toast-info { border-left-color:var(--accent); }
+@keyframes toast-in { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+/* Indicador de carregamento assíncrono global. */
+.global-loader { position:fixed; inset:0; z-index:500; display:grid; place-items:center; background:rgba(5,9,12,.56); backdrop-filter:blur(2px); }
+.global-loader.hidden { display:none; }
+.global-loader-card { display:flex; align-items:center; gap:10px; padding:12px 15px; border:1px solid var(--line); border-radius:10px; background:var(--panel); color:var(--text); box-shadow:0 18px 40px rgba(0,0,0,.35); font-size:12px; }
+.global-spinner { width:18px; height:18px; border:2px solid rgba(194,210,220,.28); border-top-color:var(--accent); border-radius:50%; animation:global-spin .7s linear infinite; }
+@keyframes global-spin { to { transform:rotate(360deg); } }
+
+/* Espaçamento e organização dos painéis laterais. */
+.left-panel, .right-panel { padding:16px; }
+.panel-section { margin-bottom:12px; }
+
+/* Toolbar do canvas com separação visual e área de toque maior. */
+.canvas-toolbar { padding:6px; border-radius:10px; gap:10px; }
+.canvas-toolbar button { min-width:34px; min-height:34px; border-radius:8px; }
+.tool-group { gap:4px; padding-right:9px; margin-right:1px; }
+
+/* Salas: estados ativo/inativo e ação principal mais evidente. */
+.room-status-active { color:#4ade80; font-weight:700; }
+.room-status-inactive { color:#fca5a5; font-weight:700; }
+.room-list-item .room-enter-btn { border-color:rgba(157,196,223,.42); background:rgba(157,196,223,.08); color:var(--text); }
+.room-list-item .room-enter-btn:hover { border-color:var(--accent); background:rgba(157,196,223,.15); }
+
+/* Destaque do estado inválido no canvas. */
+
+/* Responsividade dos painéis e formulário de login. */
+@media (max-width: 768px) {
+  .left-panel, .right-panel { padding:12px; }
+  .panel-section { margin-bottom:9px; }
+  .canvas-toolbar { max-width:calc(100vw - 24px); overflow-x:auto; }
+}
+@media (max-width: 420px) {
+  .left-panel { width:96vw; }
+  .right-panel { width:96vw; }
+  .canvas-toolbar button { min-width:38px; min-height:38px; }
+  .toast-container { left:10px; right:10px; bottom:10px; }
+}
+
+/* FRENTE 41 — refinamentos adicionais de UX/UI. */
+.text-high-contrast { color: var(--text) !important; }
+.stepper-hint { margin: 4px auto 0; max-width:380px; color:var(--muted); font-size:10px; text-align:center; line-height:1.4; }
+.login-primary-action:hover .login-action-icon { transform:translateY(-1px); }
+.login-action-icon { transition:transform .16s ease; }
+.room-list-item { gap:12px; }
+.room-list-item small { line-height:1.5; }
+.room-list-item .room-enter-btn { min-height:34px; }
+.home-account-action:focus-visible, .room-enter-btn:focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+
+@media (max-width: 768px) {
+  .stepper-hint { padding:0 10px; }
+  .left-panel, .right-panel { padding:14px; }
+}
