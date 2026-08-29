@@ -248,8 +248,33 @@ function setLoginRole(role) {
  * Wrapper do cliente que encaminha requisições para o módulo de comunicação com o backend.
  */
 async function apiRequest(path, options = {}) {
-  if (window.LocalRoomBackend?.request) return window.LocalRoomBackend.request(path, options);
-  throw new Error("Backend local indisponível.");
+  const gasUrl = window.APP_CONFIG?.GAS_URL || "";
+  if (!gasUrl) throw new Error("Backend GAS não configurado.");
+  const routeMap = {
+    "/api/auth/login": "authLogin",
+    "/api/auth/register": "authRegister",
+    "/api/auth/logout": "authLogout",
+    "/api/sala/criar": "criar",
+    "/api/sala/entrar": "entrar",
+    "/api/sala/salvar": "salvar",
+    "/api/sala/encerrar": "encerrar",
+    "/api/usuario/salas": "usuarioSalas",
+    "/api/sala/participantes": "participantes",
+    "/api/sinalizacao/enviar": "enviarSinal"
+  };
+  let action = routeMap[path];
+  if (!action && path.startsWith("/api/sala/status/")) action = "status";
+  if (!action) throw new Error(`Endpoint não suportado: ${path}`);
+  const body = options.body ? JSON.parse(options.body) : {};
+  body.action = action;
+  if (action === "status") body.codigo = decodeURIComponent(path.slice("/api/sala/status/".length));
+  const sessionToken = localStorage.getItem("mapa_riscos_remote_session_v1");
+  if (sessionToken) body.sessionToken = sessionToken;
+  const response = await fetch(gasUrl, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) });
+  if (!response.ok) throw new Error(`Erro de comunicação com o backend (${response.status}).`);
+  const data = await response.json();
+  if (!data?.ok) throw new Error(data?.error || "Operação não concluída.");
+  return data;
 }
 /**
  * Salva no armazenamento local os dados mínimos da sessão da sala.
@@ -3107,7 +3132,8 @@ window.addEventListener("keydown", e => {
 /** Restaura a sessão local salva no navegador. */
 async function bootstrapLocalSession() {
   const user = AuthAPI.getCurrentUser();
-  if (!user) return false;
+  const token = localStorage.getItem("mapa_riscos_remote_session_v1");
+  if (!user || !token) return false;
   state.user = user; applyAuthUI();
   return true;
 }

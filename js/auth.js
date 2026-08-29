@@ -46,6 +46,23 @@ async function hashPassword(password) {
 /**
  * Cria um novo usuário local e impede duplicidade de e-mail por perfil.
  */
+async function authGasRequest(action, payload = {}) {
+  const gasUrl = window.APP_CONFIG?.GAS_URL || "";
+  if (!gasUrl) throw new Error("Backend não configurado.");
+  const response = await fetch(gasUrl, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ action, ...payload })
+  });
+  if (!response.ok) throw new Error(`Erro de comunicação com o backend (${response.status}).`);
+  const data = await response.json();
+  if (!data?.ok) throw new Error(data?.error || "Operação não concluída.");
+  return data;
+}
+
+/**
+ * Cria uma conta no backend remoto usando nome, email, senha e perfil.
+ */
 async function registerUser(nome, email, senha, papel) {
   const cleanName = authCleanText(nome);
   const cleanEmail = authCleanText(email).toLowerCase();
@@ -53,44 +70,34 @@ async function registerUser(nome, email, senha, papel) {
   if (cleanName.length < 2) throw new Error("Informe seu nome completo.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) throw new Error("Informe um email válido.");
   if (String(senha).length < 6) throw new Error("A senha deve ter pelo menos 6 caracteres.");
-  const users = readAuthStore(AUTH_USERS_KEY);
-  if (users.some(u => u.email === cleanEmail && u.papel === role)) throw new Error("Já existe uma conta com esse email para este perfil.");
-  const user = {
-    id: crypto.randomUUID(),
-    nome: cleanName,
-    email: cleanEmail,
-    senhaHash: await hashPassword(senha),
-    papel: role,
-    salasCriadas: [],
-    salasParticipando: [],
-    criadoEm: new Date().toISOString()
-  };
-  users.push(user);
-  writeAuthStore(AUTH_USERS_KEY, users);
-  const publicUser = { id: user.id, nome: user.nome, email: user.email, papel: user.papel, salasCriadas: [], salasParticipando: [] };
+  const data = await authGasRequest("authRegister", { nome: cleanName, email: cleanEmail, senha: String(senha), papel: role });
+  const publicUser = data.usuario;
   writeAuthStore(AUTH_CURRENT_USER_KEY, publicUser);
+  localStorage.setItem("mapa_riscos_remote_session_v1", data.sessionToken || "");
   return publicUser;
 }
 
 /**
- * Autentica um usuário local pelo email, senha e perfil selecionado.
+ * Autentica uma conta remota pelo email, senha e perfil selecionado.
  */
 async function loginUser(email, senha, papel) {
   const cleanEmail = authCleanText(email).toLowerCase();
   const role = papel === "professor" ? "professor" : "estudante";
-  const users = readAuthStore(AUTH_USERS_KEY);
-  const user = users.find(u => u.email === cleanEmail && u.papel === role);
-  if (!user || user.senhaHash !== await hashPassword(senha)) throw new Error("Email, senha ou perfil inválido.");
-  const publicUser = { id: user.id, nome: user.nome, email: user.email, papel: user.papel, salasCriadas: user.salasCriadas || [], salasParticipando: user.salasParticipando || [] };
-  writeAuthStore(AUTH_CURRENT_USER_KEY, publicUser);
-  return publicUser;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) throw new Error("Informe um email válido.");
+  const data = await authGasRequest("authLogin", { email: cleanEmail, senha: String(senha || ""), papel: role });
+  writeAuthStore(AUTH_CURRENT_USER_KEY, data.usuario);
+  localStorage.setItem("mapa_riscos_remote_session_v1", data.sessionToken || "");
+  return data.usuario;
 }
 
 /**
  * Encerra a sessão local do usuário atual.
  */
-function logoutUserLocal() {
+async function logoutUserLocal() {
+  const sessionToken = localStorage.getItem("mapa_riscos_remote_session_v1");
+  try { if (sessionToken) await authGasRequest("authLogout", { sessionToken }); } catch (e) { console.warn("Falha ao encerrar sessão remota:", e); }
   localStorage.removeItem(AUTH_CURRENT_USER_KEY);
+  localStorage.removeItem("mapa_riscos_remote_session_v1");
 }
 
 /**
