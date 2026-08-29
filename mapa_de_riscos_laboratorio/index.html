@@ -1,0 +1,561 @@
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mapa de Riscos — Laboratório</title>
+  <link rel="stylesheet" href="css/mapa.css">
+  <!-- Google Identity Services: autenticação OAuth no frontend. -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <!-- Tela de autenticação: entrada como professor ou estudante. -->
+<section id="loginScreen" class="login-screen" aria-labelledby="loginTitle">
+    <div class="login-shell">
+      <div class="login-brand">
+        <div class="login-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M9 4h14M12 4v9l-6 10a4 4 0 0 0 3.5 5.9h13A4 4 0 0 0 26 23l-6-10V4M8 21h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <span class="login-eyebrow">ACESSO À SALA</span>
+          <h1 id="loginTitle">Mapa de Riscos do Laboratório</h1>
+          <p>Entre como professor para criar e gerenciar uma sala ou como estudante para acompanhar uma sala existente.</p>
+        </div>
+      </div>
+
+      <div class="login-role-tabs" role="tablist" aria-label="Tipo de acesso">
+        <button id="loginRoleProfessor" class="login-role-tab active" type="button" role="tab" aria-selected="true" aria-controls="loginProfessorPanel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5M8 17h3"/></svg>
+          <span>Sou Professor</span>
+        </button>
+        <button id="loginRoleStudent" class="login-role-tab" type="button" role="tab" aria-selected="false" aria-controls="loginStudentPanel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7M3 4h18"/></svg>
+          <span>Sou Estudante</span>
+        </button>
+      </div>
+
+      <!-- Autenticação oficial com Google Identity Services. O callback é global para o GIS. -->
+      <div class="google-login-panel" aria-labelledby="googleLoginTitle">
+        <h2 id="googleLoginTitle">Entrar com Google</h2>
+        <p>Use sua conta Google para autenticar o acesso e recuperar suas salas.</p>
+        <div id="g_id_onload" data-context="signin" data-ux_mode="popup" data-callback="handleGoogleSignIn" data-auto_select="false"></div>
+        <div id="googleSignInButton" class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
+        <div id="googleUserStatus" class="google-user-status" aria-live="polite">Não autenticado</div>
+      </div>
+
+      <div id="loginError" class="login-feedback hidden" role="alert" aria-live="assertive"></div>
+      <div id="loginLoading" class="login-loading hidden" aria-live="polite">Verificando sala…</div>
+
+      <section id="loginProfessorPanel" class="login-panel" role="tabpanel" aria-labelledby="loginRoleProfessor">
+        <div class="login-panel-head">
+          <h2>Acesso do professor</h2>
+          <p>Crie uma nova sala ou retome uma sessão já criada neste navegador.</p>
+        </div>
+        <button id="createRoomBtn" class="login-primary-action" type="button">
+          <span class="login-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14M4 4h16v16H4z"/></svg></span>
+          <span><strong>Criar nova sala</strong><small>Gerar um código único de 6 caracteres</small></span>
+        </button>
+        <div class="login-divider"><span>ou retomar</span></div>
+        <form id="professorJoinForm" class="login-form">
+          <label for="professorRoomCode">Código da sala</label>
+          <div class="login-input-row">
+            <input id="professorRoomCode" type="text" inputmode="text" autocomplete="one-time-code" maxlength="6" placeholder="A7B2C9" aria-label="Código da sala do professor">
+            <button type="submit">Entrar</button>
+          </div>
+          <small>O professor pode retomar automaticamente uma sala criada anteriormente neste navegador.</small>
+        </form>
+      </section>
+
+      <section id="loginStudentPanel" class="login-panel hidden" role="tabpanel" aria-labelledby="loginRoleStudent">
+        <div class="login-panel-head">
+          <h2>Acesso do estudante</h2>
+          <p>Digite o código compartilhado pelo professor para entrar na sala.</p>
+        </div>
+        <form id="studentJoinForm" class="login-form">
+          <label for="studentRoomCode">Código da sala</label>
+          <input id="studentRoomCode" class="login-code-input" type="text" inputmode="text" autocomplete="one-time-code" maxlength="6" placeholder="A7B2C9" aria-label="Digite o código da sala">
+          <button class="login-primary-action" type="submit"><span class="login-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><span><strong>Entrar na sala</strong><small>Visualização em modo estudante</small></span></button>
+        </form>
+      </section>
+
+      <div class="login-note">A sala fica ativa até ser encerrada pelo professor.</div>
+    </div>
+  </section>
+
+  <!-- Hub inicial: escolha de novo projeto, projeto salvo, modelo ou importação. -->
+<section id="homeScreen" class="home-screen" aria-labelledby="homeTitle">
+    <div class="home-content">
+      <div class="home-brand">
+        <div class="home-brand-mark" aria-hidden="true">
+          <svg viewbox="0 0 32 32"><path d="M9 4h14M12 4v9l-6 10a4 4 0 0 0 3.5 5.9h13A4 4 0 0 0 26 23l-6-10V4M8 21h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </div>
+        <div>
+          <span class="home-eyebrow">MAPEAMENTO · SEGURANÇA LABORATORIAL</span>
+          <h1 id="homeTitle">Mapa de Riscos do Laboratório</h1>
+          <p>Editor 2D em escala métrica para construir, conferir e documentar plantas de risco.</p>
+        </div>
+      </div>
+
+      <div class="home-account-bar">
+        <div id="homeUserIdentity" class="home-user-identity" aria-live="polite">Não autenticado</div>
+        <button id="homeLogoutBtn" type="button" class="home-account-action">Sair</button>
+      </div>
+
+      <div class="home-recent home-recent-top" id="recentProjects" hidden>
+        <div class="home-recent-head">
+          <div>
+            <h2>Continuar de onde parou</h2>
+            <p>Existe um autosave disponível neste navegador.</p>
+          </div>
+          <button id="homeContinue" class="home-continue" type="button">Continuar último projeto</button>
+        </div>
+        <div id="recentList" class="recent-list"></div>
+      </div>
+
+      <!-- Salas vinculadas à conta Google autenticada. -->
+      <section id="userRoomsSection" class="home-recent user-rooms-section" hidden aria-labelledby="userRoomsTitle">
+        <div class="home-recent-head">
+          <div><h2 id="userRoomsTitle">Minhas salas</h2><p>Salas criadas ou das quais você participa.</p></div>
+          <button id="refreshUserRooms" class="home-continue" type="button">Atualizar</button>
+        </div>
+        <div id="userRoomsList" class="recent-list"></div>
+      </section>
+
+      <h2 class="home-start-title">Como você quer começar?</h2>
+
+
+      <div class="home-actions" aria-label="Como deseja começar?">
+        <button id="homeNewProject" class="home-card home-card-primary" type="button">
+          <span class="home-icon" aria-hidden="true"><svg viewbox="0 0 24 24"><path d="M12 5v14M5 12h14"></path><rect x="3" y="3" width="18" height="18" rx="3"></rect></svg></span>
+          <strong>Novo Projeto</strong>
+          <small>Criar um laboratório vazio e começar do zero.</small>
+        </button>
+        <button id="homeUseModel" class="home-card home-card-secondary" type="button">
+          <span class="home-icon" aria-hidden="true"><svg viewbox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M7 16l3-4 2 2 2-3 3 5"></path></svg></span>
+          <strong>Usar Modelo</strong>
+          <small>Escolher um layout pronto para laboratório ou almoxarifado.</small>
+        </button>
+        <button id="homeOpenProject" class="home-card home-card-secondary" type="button">
+          <span class="home-icon" aria-hidden="true"><svg viewbox="0 0 24 24"><path d="M3 7h6l2 2h10v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M3 7V5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2"></path></svg></span>
+          <strong>Abrir Projeto</strong>
+          <small>Carregar um projeto JSON salvo anteriormente.</small>
+        </button>
+        <button id="homeImportModel" class="home-card home-card-secondary" type="button">
+          <span class="home-icon" aria-hidden="true"><svg viewbox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4"></path><path d="M5 19h14"></path><rect x="3" y="3" width="18" height="18" rx="3"></rect></svg></span>
+          <strong>Importar Modelo JSON</strong>
+          <small>Carregar um layout completo em arquivo .json.</small>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editor principal: interface completa de edição do mapa. -->
+<div class="app hidden" id="app">
+    <!-- Barra superior: navegação, área ativa, stepper e ações globais. -->
+<header class="topbar" role="banner">
+      <button id="roomCodeBadge" class="room-code-badge" type="button" title="Código da sala" aria-label="Código da sala">Sala <strong id="roomCodeText">—</strong></button>
+      <button id="endRoomBtn" type="button" class="topbar-end-room" title="Encerrar sala" aria-label="Encerrar sala">Encerrar</button>
+      <button id="logoutBtn" type="button" class="topbar-text-btn" title="Sair da conta Google" aria-label="Sair da conta Google">Sair</button>
+      <button id="homeBtn" type="button" title="Voltar à tela inicial" aria-label="Voltar à tela inicial" class="topbar-icon-btn"><svg viewbox="0 0 24 24" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5M5 9v11h14V9M9 20v-6h6v6"></path></svg></button><div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewbox="0 0 32 32">
+            <path d="M9 4h14M12 4v9l-6 10a4 4 0 0 0 3.5 5.9h13A4 4 0 0 0 26 23l-6-10V4M8 21h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </div>
+        <div>
+          <strong>Mapa de Riscos do Laboratório</strong>
+          <small>Editor 2D em escala métrica</small>
+        </div>
+      </div>
+
+      <span id="projectName" class="project-name">Laboratório</span><div class="mobile-nav-controls">
+        <button id="btnToggleTools" class="mobile-only-btn" type="button" aria-label="Abrir Painel de Ferramentas">
+          <svg viewbox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+        </button>
+        <button id="btnToggleProps" class="mobile-only-btn" type="button" aria-label="Abrir Painel de Propriedades">
+          <svg viewbox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+
+      <div class="area-switcher" aria-label="Área ativa"><span class="area-switcher-label">Área</span><select id="areaSelect" aria-label="Selecionar área ativa"></select>
+          </div><div class="stepper" aria-label="Etapas de construção do mapa">
+        <button class="step active" id="step-1" type="button" aria-current="step">
+          <span class="step-num">1</span>
+          <b>Ambiente</b>
+          <span class="step-check" aria-hidden="true">✓</span>
+        </button>
+        <i></i>
+        <button class="step pending" id="step-2" type="button">
+          <span class="step-num">2</span>
+          <b>Riscos</b>
+          <span class="step-check" aria-hidden="true">✓</span>
+        </button>
+        <i></i>
+        <button class="step pending" id="step-3" type="button">
+          <span class="step-num">3</span>
+          <b>Conferir</b>
+          <span class="step-check" aria-hidden="true">✓</span>
+        </button>
+      </div>
+
+      <div><div class="top-action-group top-action-edit"><button id="undo" title="Desfazer (Ctrl+Z)" aria-label="Desfazer ação anterior (Ctrl+Z)">
+          <svg viewbox="0 0 24 24"><path d="M3 7v6h6M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+          <span class="btn-label">Desfazer</span>
+        </button>
+        <button id="redo" title="Refazer (Ctrl+Y)" aria-label="Refazer ação desfeita (Ctrl+Y)">
+          <svg viewbox="0 0 24 24"><path d="M21 7v6h-6M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"></path></svg>
+          <span class="btn-label">Refazer</span>
+        </button>
+        </div><div class="top-action-group top-action-file"><button id="btnShortcuts" title="Atalhos de Teclado (?)" aria-label="Abrir guia de atalhos de teclado">
+          <svg viewbox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 15h.01M12 7a3 3 0 0 1 3 3c0 2-3 3-3 3"></path></svg>
+          <span class="btn-label">Ajuda</span>
+        </button>
+        <button id="save" title="Salvar Arquivo JSON" aria-label="Salvar projeto em formato JSON">
+          <svg viewbox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2zM17 21v-8H7v8M7 3v5h8"></path></svg>
+          <span>Salvar</span>
+        </button>
+        <button id="exportSvg" title="Exportar Mapa em SVG" aria-label="Exportar imagem do mapa em SVG">
+          <svg viewbox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M12 18v-6M9 15l3 3 3-3"></path></svg>
+          <span>SVG</span>
+        </button>
+        <button id="load" title="Abrir arquivo de mapa" aria-label="Carregar projeto JSON salvo">
+          <svg viewbox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          <span>Abrir</span>
+        </button>
+      </div></div></header>
+
+    <!-- Área de trabalho: painéis laterais e canvas central. -->
+<main class="workspace">
+      <!-- PAINEL ESQUERDO -->
+      <!-- Painel esquerdo: projeto, ambiente, paleta de elementos e dicas. -->
+<aside class="left-panel" id="leftPanel" tabindex="0" aria-label="Painel de Ferramentas e Elementos"><div class="mobile-panel-header"><strong>Ferramentas</strong><button type="button" class="mobile-panel-close" id="closeToolsPanel" aria-label="Fechar painel de ferramentas">×</button></div><details class="panel-section panel-section-project" open="open"><summary class="panel-section-head"><span class="panel-section-icon"><svg viewbox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8 8h8v8H8z"></path></svg></span><span class="panel-section-title">Projeto</span><span class="panel-section-chevron" aria-hidden="true">›</span></summary><div class="panel-section-body"><!-- Cabeçalho do editor: identificação e contexto do mapa. -->
+<section class="intro">
+          <span class="eyebrow">MAPEAMENTO</span>
+          <h1>Monte a planta</h1>
+          <p>Defina o tamanho real da sala e depois posicione estrutura, riscos e itens de segurança.</p>
+        </section>
+
+
+        <!-- Gerenciador de áreas: criar, renomear, excluir e alternar ambientes. -->
+<section class="area-manager" id="areaManager">
+          <div class="section-title">Áreas do projeto</div>
+          <div class="area-name-row">
+            <input id="areaName" type="text" maxlength="60" placeholder="Nome da área" aria-label="Nome da área">
+            <button id="renameArea" type="button" title="Renomear área">Renomear</button>
+          </div>
+          <label for="areaType">Tipo da área
+            <select id="areaType" aria-label="Tipo da área">
+              <option value="laboratorio">Laboratório</option>
+              <option value="almoxarifado">Almoxarifado</option>
+              <option value="corredor">Corredor</option>
+              <option value="preparo">Sala de preparo</option>
+              <option value="apoio">Área de apoio</option>
+            </select>
+          </label>
+          <div class="area-actions">
+            <button class="primary" id="newArea" type="button">Nova Área</button>
+            <button id="openModels" type="button">Modelos</button>
+            <button id="deleteArea" type="button">Excluir Área</button>
+            <button id="toggleOverview" type="button">Ver todas as áreas</button>
+          </div>
+          <div class="area-meta" id="areaMeta" aria-live="polite"></div>
+        </section>
+
+        <!-- Configuração das dimensões da área ativa. -->
+<section class="room-card" id="environmentSection">
+          <div class="section-title">Dimensões da sala</div>
+          <div class="dimension-grid">
+            <label for="roomW">Largura
+              <div class="input-unit"><input id="roomW" type="number" value="12" min="2" max="100" step="0.1" aria-label="Largura da sala em metros"><span>m</span></div>
+            </label>
+            <label for="roomH">Comprimento
+              <div class="input-unit"><input id="roomH" type="number" value="8" min="2" max="100" step="0.1" aria-label="Comprimento da sala em metros"><span>m</span></div>
+            </label>
+          </div>
+          <div id="roomFeedback" class="feedback" aria-live="polite">Sala atual: 12,0 × 8,0 m</div>
+          <div class="room-actions">
+            <button class="primary full" id="applyRoom" aria-label="Aplicar dimensões da sala">Aplicar dimensões</button>
+            <button class="full" id="fitRoom" title="Atalho: F" aria-label="Enquadrar sala na tela (Atalho F)">Enquadrar sala (F)</button>
+          </div>
+        </section>
+
+        </div></details><details class="panel-section" open="open"><summary class="panel-section-head"><span class="panel-section-icon"><svg viewbox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 10h16M4 15h16"></path></svg></span><span class="panel-section-title">Estrutura</span><span class="panel-section-chevron" aria-hidden="true">›</span></summary><div class="panel-section-body"><div id="palette" class="palette palette-group"><button data-type="wall" aria-label="Adicionar Parede"><span class="icon"><svg viewbox="0 0 24 24"><path d="M3 5h18v14H3zM3 10h18M3 15h18M9 5v5M15 10v5M9 15v4"></path></svg></span><b>Parede</b><small>Estrutura</small></button>
+            <button data-type="door" aria-label="Adicionar Porta"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 20V4h9v16M13 20h7M13 4a9 9 0 0 1 9 9M13 13h2"></path></svg></span><b>Porta</b><small>Acesso</small></button>
+            <button data-type="window" aria-label="Adicionar Janela"><span class="icon"><svg viewbox="0 0 24 24"><path d="M3 5h18v14H3zM3 12h18M12 5v14"></path></svg></span><b>Janela</b><small>Abertura</small></button>
+            <button data-type="zone" aria-label="Adicionar Área de Circulação"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 4h16v16H4zM8 8h8v8H8z"></path></svg></span><b>Circulação</b><small>Área livre</small></button>
+
+            </div></div></details><details class="panel-section" open="open"><summary class="panel-section-head"><span class="panel-section-icon"><svg viewbox="0 0 24 24" aria-hidden="true"><path d="M3 6h18v4H3zM5 10v9M19 10v9M7 15h10"></path></svg></span><span class="panel-section-title">Mobiliário e Equipamentos</span><span class="panel-section-chevron" aria-hidden="true">›</span></summary><div class="panel-section-body"><div class="palette palette-group"><button data-type="bench" aria-label="Adicionar Bancada"><span class="icon"><svg viewbox="0 0 24 24"><path d="M3 6h18v4H3zM5 10v9M19 10v9M7 15h10"></path></svg></span><b>Bancada</b><small>Trabalho</small></button>
+            <button data-type="benchL" aria-label="Adicionar Bancada em L"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 5h16v4H8v10H4zM8 15h12v4H8z"></path></svg></span><b>Bancada L</b><small>Canto</small></button>
+            <button data-type="sink" aria-label="Adicionar Pia"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 7h16v10H4zM7 12h10M12 7V4M9 4h6"></path></svg></span><b>Pia</b><small>Água</small></button>
+            <button data-type="hood" aria-label="Adicionar Capela de Exaustão"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 5h16v15H4zM7 9h10v7H7zM9 3h6"></path></svg></span><b>Capela</b><small>Exaustão</small></button>
+            <button data-type="cabinet" aria-label="Adicionar Armário"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 3h16v18H4zM12 3v18M8 8h1M15 8h1"></path></svg></span><b>Armário</b><small>Armazenamento</small></button>
+            <button data-type="shelf" aria-label="Adicionar Estante"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 4h16M4 10h16M4 16h16M4 21h16M6 4v17M18 4v17"></path></svg></span><b>Estante</b><small>Armazenamento</small></button>
+            <button data-type="equipment" aria-label="Adicionar Equipamento"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 5h16v14H4zM7 8h10v5H7zM9 16h6"></path></svg></span><b>Equipamento</b><small>Área técnica</small></button>
+            </div></div></details><details class="panel-section" open="open"><summary class="panel-section-head"><span class="panel-section-icon"><svg viewbox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 17H3L12 3zM12 9v4M12 17h.01"></path></svg></span><span class="panel-section-title">Riscos</span><span class="panel-section-chevron" aria-hidden="true">›</span></summary><div class="panel-section-body"><div class="palette palette-group"><button data-type="chemical" class="risk risk-chemical" aria-label="Adicionar Risco Químico"><span class="icon"><svg viewbox="0 0 24 24"><path d="M9 3h6M10 3v7l-6 9a2 2 0 0 0 1.7 3h12.6A2 2 0 0 0 20 19l-6-9V3M7 16h10"></path></svg></span><b>Químico</b><small>Risco químico</small></button>
+            <button data-type="biological" class="risk risk-biological" aria-label="Adicionar Risco Biológico"><span class="icon"><svg viewbox="0 0 24 24"><path d="M12 4c-3 0-5 3-5 6 0 4 2 7 5 10 3-3 5-6 5-10 0-3-2-6-5-6zM7 9c-3-1-5 1-5 4s3 4 6 2M17 9c3-1 5 1 5 4s-3 4-6 2M12 4V2"></path></svg></span><b>Biológico</b><small>Risco biológico</small></button>
+            <button data-type="physical" class="risk risk-physical" aria-label="Adicionar Risco Físico"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 17l6-10 3 5 3-4 4 9M5 20h14"></path></svg></span><b>Físico</b><small>Ruído, calor etc.</small></button>
+            <button data-type="fire" class="risk risk-fire" aria-label="Adicionar Risco de Incêndio"><span class="icon"><svg viewbox="0 0 24 24"><path d="M12 21c-4 0-7-3-7-7 0-3 2-5 5-8 0 3 2 4 3 5 0-4 2-6 3-8 1 3 3 5 3 9 0 5-3 9-7 9z"></path></svg></span><b>Incêndio</b><small>Risco de fogo</small></button>
+            <button data-type="electrical" class="risk risk-electrical" aria-label="Adicionar Risco Elétrico"><span class="icon"><svg viewbox="0 0 24 24"><path d="M13 2L5 13h6l-1 9 9-12h-6z"></path></svg></span><b>Elétrico</b><small>Risco elétrico</small></button>
+            <button data-type="ergonomic" class="risk risk-ergonomic" aria-label="Adicionar Risco Ergonômico"><span class="icon"><svg viewbox="0 0 24 24"><path d="M8 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4M7 10l-2 5h5l2 5M12 11h5M17 11v8"></path></svg></span><b>Ergonômico</b><small>Postura, esforço</small></button>
+            <button data-type="radiation" class="risk risk-radiation" aria-label="Adicionar Risco de Radiação"><span class="icon"><svg viewbox="0 0 24 24"><path d="M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M12 10V3M10.3 13l-6 3.5M13.7 13l6 3.5M12 3a9 9 0 0 1 7.8 13.5M12 3a9 9 0 0 0-7.8 13.5"></path></svg></span><b>Radiação</b><small>Ionizante / UV</small></button>
+            <button data-type="slip" class="risk risk-slip" aria-label="Adicionar Risco de Queda"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 18h16M7 14l3-5 3 3 4-6M5 20h14"></path></svg></span><b>Queda</b><small>Piso / circulação</small></button>
+
+            </div></div></details><details class="panel-section" open="open"><summary class="panel-section-head"><span class="panel-section-icon"><svg viewbox="0 0 24 24" aria-hidden="true"><path d="M5 20h14M12 3v11M8 10l4-4 4 4"></path></svg></span><span class="panel-section-title">Emergência</span><span class="panel-section-chevron" aria-hidden="true">›</span></summary><div class="panel-section-body"><div class="palette palette-group"><button data-type="shower" aria-label="Adicionar Chuveiro de Emergência"><span class="icon"><svg viewbox="0 0 24 24"><path d="M5 10h14M7 10a5 5 0 0 1 10 0M12 10v3M8 15v4M12 15v4M16 15v4"></path></svg></span><b>Chuveiro</b><small>Emergência</small></button>
+            <button data-type="eyewash" aria-label="Adicionar Lava-Olhos de Emergência"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 13h16M7 13V9h10v4M9 9V6h6v3M6 17c2-2 4-2 6 0M12 17c2-2 4-2 6 0"></path></svg></span><b>Lava-olhos</b><small>Emergência</small></button>
+            <button data-type="extinguisher" aria-label="Adicionar Extintor de Incêndio"><span class="icon"><svg viewbox="0 0 24 24"><path d="M8 6h8v14H8zM10 6V4h5l2 2M16 9h4M18 9v4M10 10h4"></path></svg></span><b>Extintor</b><small>Emergência</small></button>
+            <button data-type="exit" aria-label="Adicionar Saída de Emergência"><span class="icon"><svg viewbox="0 0 24 24"><path d="M4 3h10v18H4zM14 12h7M18 9l3 3-3 3"></path></svg></span><b>Saída</b><small>Emergência</small></button>
+          </div></div></details><details class="panel-section"><summary class="panel-section-head"><span class="panel-section-icon"><svg viewbox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 22h4M8 14a6 6 0 1 1 8 0c-1 1-2 2-2 4h-4c0-2-1-3-2-4z"></path></svg></span><span class="panel-section-title">Dicas</span><span class="panel-section-chevron" aria-hidden="true">›</span></summary><div class="panel-section-body"><div class="help-box">
+          <strong>Como usar</strong>
+          <span>1. Redimensione a sala ou escolha elementos na paleta.</span>
+          <span>2. Pressione Alt + Arrastar ou Ctrl + D para duplicar.</span>
+          <span>3. Agrupe elementos selecionados pressionando a tecla G.</span>
+          <span>4. Use Setas (Shift = rápido), R para girar e + / - para escalar.</span>
+          <span>5. Navegue por Tab, focar camadas (Ctrl+L) e propriedades (Ctrl+P).</span>
+        </div>
+      </div></details></aside><!-- ÁREA CENTRAL: CANVAS -->
+      <section class="canvas-area" tabindex="0" aria-label="Área de Trabalho Principal do Editor">
+        <div class="canvas-toolbar" role="toolbar" aria-label="Ferramentas do Canvas">
+          <div class="tool-group">
+            <button class="mode active" id="selectMode" title="Selecionar elementos" aria-label="Ativar Modo Seleção">
+              <svg viewbox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"></path></svg>
+              <span>Selecionar</span>
+            </button>
+            <button class="mode" id="panMode" title="Mover área do mapa" aria-label="Ativar Modo Panorâmico">
+              <svg viewbox="0 0 24 24"><path d="M5 9l-3 3 3 3M19 9l3 3-3 3M9 5l3-3 3 3M9 19l3 3 3-3M12 12h0"></path></svg>
+              <span>Mover</span>
+            </button>
+          </div>
+
+          <div class="tool-group">
+            <button id="grid" title="Alternar grade de referência" aria-label="Alternar exibição da grade">
+              <svg viewbox="0 0 24 24"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"></path></svg>
+              <span>Grade</span>
+            </button>
+            <button id="snap" title="Alinhamento magnético (Snap 10 cm)" aria-label="Alternar Snap Magnético de 10cm">
+              <svg viewbox="0 0 24 24"><path d="M6 3v6a6 6 0 0 0 12 0V3M4 3h4M16 3h4M12 15v6M9 18h6"></path></svg>
+              <span>Snap</span>
+            </button>
+            <button id="ruler" title="Exibir cotas e medidas" aria-label="Alternar exibição de cotas e medidas">
+              <svg viewbox="0 0 24 24"><path d="M2 4h20v16H2zM6 4v4M10 4v2M14 4v4M18 4v2"></path></svg>
+              <span>Cotas</span>
+            </button>
+          </div>
+
+          <div class="zoom">
+            <button id="zoomOut" title="Diminuir Zoom" aria-label="Diminuir Zoom do Canvas">
+              <svg viewbox="0 0 24 24"><path d="M5 12h14"></path></svg>
+            </button>
+            <span id="zoomText" aria-live="polite">100%</span>
+            <button id="zoomIn" title="Aumentar Zoom" aria-label="Aumentar Zoom do Canvas">
+              <svg viewbox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- BARRA CONTEXTUAL PARA ELEMENTOS SELECIONADOS -->
+        <!-- Barra contextual: ações rápidas para a seleção atual. -->
+<div id="contextualToolbar" class="contextual-toolbar hidden" role="toolbar" aria-label="Ações para Seleção Atual">
+          <button id="ctxHide" title="Ocultar / Mostrar visibilidade" aria-label="Alternar Visibilidade dos elementos selecionados"><svg viewbox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Visibilidade</button>
+          <button id="ctxLock" title="Bloquear / Desbloquear movimentação" aria-label="Alternar Bloqueio dos elementos selecionados"><svg viewbox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Bloqueio</button>
+          <button id="ctxDuplicate" title="Duplicar (Ctrl+D)" aria-label="Duplicar elementos selecionados"><svg viewbox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></svg> Duplicar</button>
+          <button id="ctxRotate" title="Girar 90°" aria-label="Girar elementos selecionados em noventa graus"><svg viewbox="0 0 24 24"><path d="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11h2.02c.14-.87.52-1.67 1.02-2.47zM6.09 13H4.07c.17 1.39.73 2.73 1.6c.14.87.52 1.67 1.02 2.47l-1.41 1.41C4.37 15.61 3.73 13.91 3.56 12h2.02c.17 1.39.73 2.73 1.6 3.87zM12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8z"></path></svg> Girar</button>
+          <button id="ctxGroup" title="Agrupar selecionados (G)" aria-label="Agrupar elementos selecionados"><svg viewbox="0 0 24 24"><path d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z"></path></svg> Agrupar</button>
+          <button id="ctxUngroup" class="hidden" title="Desagrupar (Shift+G)" aria-label="Desagrupar grupo selecionado"><svg viewbox="0 0 24 24"><path d="M4 4h4v4H4zm12 0h4v4h-4zM4 16h4v4H4zm12 0h4v4h-4z"></path></svg> Desagrupar</button>
+          <button id="ctxDelete" class="danger-btn" title="Excluir (Del)" aria-label="Excluir elementos selecionados"><svg viewbox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Excluir</button>
+        </div>
+
+        <!-- Canvas principal onde a planta é desenhada e editada. -->
+<canvas id="canvas" tabindex="0" role="application" aria-label="Área de trabalho interativa do Mapa de Riscos"></canvas>
+
+        <div class="canvas-help">Dica: Setas movem elementos. R gira. + / - redimensiona. Ctrl+L para camadas, Ctrl+P para propriedades.</div>
+      </section>
+
+      <!-- PAINEL DIREITO -->
+      <!-- Painel direito: camadas, propriedades e relatório. -->
+<aside class="right-panel" id="rightPanel" tabindex="0" aria-label="Painel lateral de edição"><div class="mobile-panel-header"><strong>Painel</strong><button type="button" class="mobile-panel-close" id="closePropsPanel" aria-label="Fechar painel lateral">×</button></div><!-- Abas do painel direito. -->
+<div class="panel-tabs" role="tablist" aria-label="Painel lateral"><button id="panelTab-layers" class="panel-tab" type="button" role="tab" aria-selected="true" data-panel-tab="layers"><span>Camadas</span><span id="layersBadge" class="tab-badge">0</span></button><button id="panelTab-properties" class="panel-tab" type="button" role="tab" aria-selected="false" data-panel-tab="properties"><span>Propriedades</span></button><button id="panelTab-report" class="panel-tab" type="button" role="tab" aria-selected="false" data-panel-tab="report"><span>Relatório</span><span id="reportBadge" class="tab-badge">0/10</span></button></div><!-- Área de alertas de validação independente da aba. -->
+<div id="validationAlert" class="validation-box validation-box-global hidden" aria-live="polite"></div><div class="panel-tab-content" id="panelContent-layers" data-panel-content="layers" role="tabpanel"><section style="margin-top: 16px;">
+          <div class="tree-header">
+            <h3>Camadas e Objetos</h3>
+            <span class="badge" id="totalObjectsBadge" aria-live="polite">0 itens</span>
+          </div>
+          <div class="help-text">Use setas para navegar, Enter para selecionar, Shift+Enter para seleção múltipla. (Ctrl+L)</div>
+          <div id="objectsTree" class="objects-tree" role="listbox" aria-label="Lista de Camadas e Objetos" tabindex="0"></div>
+        </section>
+
+        <section class="risk-summary">
+          <div class="section-title">Resumo de Riscos</div>
+          <div id="riskList" class="risk-list" aria-live="polite"></div>
+        </section>
+
+        </div><div class="panel-tab-content" id="panelContent-properties" data-panel-content="properties" role="tabpanel" hidden="hidden"><section class="selection-head">
+          <div class="tree-header">
+            <h3 id="title">Nenhum elemento</h3>
+          </div>
+          <p id="sub">Selecione um objeto no mapa para editar.</p>
+        </section>
+
+        <div id="props" class="hidden" tabindex="-1">
+          <div class="prop-section">
+            <div class="section-title">Posição e Tamanho</div>
+            <div class="two">
+              <label for="x">Posição X (m)
+                <input id="x" type="number" step="0.1" aria-label="Posição horizontal X em metros">
+              </label>
+              <label for="y">Posição Y (m)
+                <input id="y" type="number" step="0.1" aria-label="Posição vertical Y em metros">
+              </label>
+            </div>
+            <div class="two">
+              <label for="w">Largura (m)
+                <input id="w" type="number" step="0.1" min="0.1" aria-label="Largura do elemento em metros">
+              </label>
+              <label for="h">Altura (m)
+                <input id="h" type="number" step="0.1" min="0.1" aria-label="Altura do elemento em metros">
+              </label>
+            </div>
+            <label for="rot">Rotação (graus)
+              <div class="rotation">
+                <input id="rot" type="range" min="0" max="345" step="15" value="0" aria-label="Ângulo de rotação em graus">
+                <output id="rotVal" aria-live="polite">0°</output>
+              </div>
+            </label>
+            <label id="epiField" for="epi" class="hidden">EPI recomendado (NR-6)
+              <input id="epi" type="text" maxlength="160" placeholder="Ex.: luvas nitrílicas, óculos de proteção">
+            </label>
+            <label id="doorConnectionField" for="doorConnection" class="hidden">Conectar porta a
+              <select id="doorConnection" aria-label="Área conectada à porta"></select>
+            </label>
+            <div class="quick-actions">
+              <button class="primary full" id="applyProps" aria-label="Aplicar modificações de propriedades">Aplicar</button>
+              <button class="full" id="rotate" aria-label="Girar elemento em noventa graus">Girar 90°</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="emptyProps" class="prop-section">
+          <div class="help-text">Nenhum elemento selecionado para edição direta.</div>
+        </div>
+
+        </div><div class="panel-tab-content" id="panelContent-report" data-panel-content="report" role="tabpanel" hidden="hidden"><section class="map-check" id="complianceSection">
+          <div class="tree-header">
+            <div class="section-title" style="margin:0;">Conformidade Técnica</div>
+            <span class="badge" id="compliance-badge" aria-live="polite">0/10</span>
+          </div>
+          <button id="openComplianceReport" class="full" type="button" style="margin-top:8px;">Relatório do Projeto</button>
+          <div style="margin-top: 8px;">
+            <div class="check" id="check-dim"><span></span> Dimensões mínimas da sala (3x3m)</div>
+            <div class="check" id="check-exit"><span></span> Saídas e portas desobstruídas (NR-23)</div>
+            <div class="check" id="check-safety"><span></span> Equipamentos de emergência instalados</div>
+            <div class="check" id="check-fire"><span></span> Proteção contra incêndio presente</div>
+            <div class="check" id="check-electrical"><span></span> Área de risco elétrico / equipamentos</div>
+            <div class="check" id="check-chemical-bio"><span></span> Mapeamento de agente químico/biológico</div>
+            <div class="check" id="check-ventilation"><span></span> Sistemas de exaustão/ventilação</div>
+            <div class="check" id="check-ergonomic"><span></span> Mobiliário ergonômico (NR-17)</div>
+            <div class="check" id="check-signaling"><span></span> Sinalização e delimitação de áreas (NR-26)</div>
+            <div class="check" id="check-epi"><span></span> Recomendação de EPIs (NR-6)</div>
+          </div>
+        </section>
+      </div></aside><div id="mobilePanelBackdrop" class="mobile-panel-backdrop" hidden></div></main>
+
+    <!-- CONTAINER DE TOASTS -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <!-- RELATÓRIO GLOBAL DE CONFORMIDADE -->
+    <div id="complianceReportModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="complianceReportTitle">
+      <div class="modal-card report-modal-card">
+        <div class="modal-header">
+          <h3 id="complianceReportTitle">Relatório de Conformidade do Projeto</h3>
+          <button id="btnCloseComplianceReport" class="btn-close" aria-label="Fechar relatório">×</button>
+        </div>
+        <div class="modal-body">
+          <div id="reportSummary" class="report-summary"></div>
+          <div id="reportList" class="report-list"></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- MODAL DE MODELOS -->
+    <!-- Modal do catálogo de modelos pré-configurados. -->
+<div id="modelsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modelsTitle">
+      <div class="modal-card models-modal-card" role="document">
+        <div class="modal-header">
+          <h3 id="modelsTitle">Modelos de Laboratório</h3>
+          <button class="btn-close" id="closeModels" aria-label="Fechar modelos">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="models-intro">Escolha um layout pronto ou importe um modelo JSON completo.</p>
+          <div id="modelsGrid" class="models-grid"></div>
+          <div class="models-footer">
+            <button id="importModel" class="primary" type="button">Importar modelo JSON</button>
+            <button id="closeModelsFooter" class="btn-secondary" type="button">Fechar</button>
+          </div>
+          <!-- Input de arquivo oculto usado para importar modelos JSON. -->
+<input id="modelFileInput" type="file" accept=".json,application/json" hidden>
+        </div>
+      </div>
+    </div>
+    <!-- MODAL DE CONFIRMAÇÃO -->
+    <!-- Modal de confirmação de ações destrutivas. -->
+<div id="confirmModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+      <div class="modal-card confirm-modal-card" role="document">
+        <div class="modal-header">
+          <h3 id="confirmTitle">Confirmar ação</h3>
+          <button class="btn-close" id="closeConfirm" aria-label="Fechar">×</button>
+        </div>
+        <div class="modal-body">
+          <p id="confirmMessage">Tem certeza que deseja continuar?</p>
+          <div class="confirm-actions">
+            <button class="btn-secondary" id="cancelConfirm" type="button">Cancelar</button>
+            <button class="btn-danger" id="confirmAction" type="button">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL DE ATALHOS COMPLETO (FASE 5.4) -->
+    <!-- Modal de atalhos de teclado. -->
+<div id="shortcutsModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="shortcutsTitle">Atalhos do Teclado</h3>
+          <button id="btnCloseShortcuts" class="btn-close" aria-label="Fechar janela de atalhos">×</button>
+        </div>
+        <div class="modal-body">
+          <ul class="shortcuts-list">
+            <li><span>Desfazer / Refazer</span><kbd>Ctrl + Z / Ctrl + Y</kbd></li>
+            <li><span>Focar Lista de Camadas</span><kbd>Ctrl + L</kbd></li>
+            <li><span>Focar Painel de Propriedades</span><kbd>Ctrl + P</kbd></li>
+            <li><span>Navegar entre Painéis</span><kbd>Tab / Shift + Tab</kbd></li>
+            <li><span>Navegar na Lista de Camadas</span><kbd>Setas Cima / Baixo</kbd></li>
+            <li><span>Selecionar Objeto da Lista</span><kbd>Enter / Shift + Enter</kbd></li>
+            <li><span>Mover Elemento no Canvas</span><kbd>Setas (Shift = 0.5m)</kbd></li>
+            <li><span>Girar Elemento Selecionado</span><kbd>R (Shift = 90°)</kbd></li>
+            <li><span>Redimensionar Elemento</span><kbd>+ / -</kbd></li>
+            <li><span>Duplicar Elemento</span><kbd>Ctrl + D / Alt + Arrastar</kbd></li>
+            <li><span>Agrupar / Desagrupar</span><kbd>G / Shift + G</kbd></li>
+            <li><span>Excluir Selecionado</span><kbd>Delete / Backspace</kbd></li>
+            <li><span>Enquadrar Sala na Tela</span><kbd>F</kbd></li>
+            <li><span>Limpar Seleção / Fechar Modal</span><kbd>Esc</kbd></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Configuração global e URL do backend. -->
+  <script defer src="js/config.js"></script>
+  <!-- Constantes, tipos, riscos, EPI e modelos. -->
+  <script defer src="js/types.js"></script>
+  <!-- Funções de geometria, colisão, contenção e clearance. -->
+  <script defer src="js/geometry.js"></script>
+  <!-- Regras de validação do mapa e dos objetos. -->
+  <script defer src="js/validation.js"></script>
+  <!-- Criptografia do estado persistido remotamente. -->
+  <script defer src="js/crypto.js"></script>
+  <!-- Comunicação com Google Apps Script e sinalização WebRTC. -->
+  <script defer src="js/room-gas.js"></script>
+  <!-- Orquestração do editor, UI, desenho e eventos. -->
+  <script defer src="js/mapa.js"></script>
+</body>
+</html>

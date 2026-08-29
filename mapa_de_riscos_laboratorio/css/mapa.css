@@ -1,0 +1,2199 @@
+
+/* .login-screen: regras visuais e de comportamento deste componente. */
+.login-screen{min-height:100dvh;width:100%;display:flex;align-items:center;justify-content:center;padding:28px 16px;background:radial-gradient(circle at 50% 0%,rgba(157,196,223,.08),transparent 42%),#0a0f13;color:var(--text);overflow:auto}
+
+/* .login-shell: regras visuais e de comportamento deste componente. */
+.login-shell{width:min(560px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.42);padding:28px}
+
+/* .login-brand: regras visuais e de comportamento deste componente. */
+.login-brand{display:flex;gap:14px;align-items:flex-start;margin-bottom:22px}
+/* .login-brand-mark: regras visuais e de comportamento deste componente. */
+.login-brand-mark{width:48px;height:48px;display:grid;place-items:center;flex:0 0 48px;border:1px solid rgba(157,196,223,.3);border-radius:12px;color:var(--accent);background:rgba(157,196,223,.08)}
+/* .login-brand-mark svg: regras visuais e de comportamento deste componente. */
+.login-brand-mark svg{width:28px;height:28px}
+/* .login-eyebrow: regras visuais e de comportamento deste componente. */
+.login-eyebrow{font-size:10px;letter-spacing:.1em;color:var(--accent);font-weight:700}
+/* .login-brand h1: regras visuais e de comportamento deste componente. */
+.login-brand h1{margin:4px 0 5px;font-size:24px;line-height:1.2}
+/* .login-brand p: regras visuais e de comportamento deste componente. */
+.login-brand p{margin:0;color:var(--muted);font-size:12px;line-height:1.55}
+/* .login-role-tabs: regras visuais e de comportamento deste componente. */
+.login-role-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+/* .login-role-tab: regras visuais e de comportamento deste componente. */
+.login-role-tab{display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);border-radius:9px}
+/* .login-role-tab svg: regras visuais e de comportamento deste componente. */
+.login-role-tab svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+/* .login-role-tab.active: regras visuais e de comportamento deste componente. */
+.login-role-tab.active{color:var(--accent);border-color:var(--accent);background:rgba(157,196,223,.07)}
+/* .login-feedback: regras visuais e de comportamento deste componente. */
+.login-feedback{margin:0 0 10px;padding:9px 10px;border:1px solid #7c3a3a;background:#2a1717;color:#fca5a5;border-radius:8px;font-size:11px}
+/* .login-feedback.hidden,.login-loading.hidden: regras visuais e de comportamento deste componente. */
+.login-feedback.hidden,.login-loading.hidden{display:none}
+/* .login-loading: regras visuais e de comportamento deste componente. */
+.login-loading{margin:0 0 10px;padding:9px 10px;border:1px solid var(--line);background:rgba(255,255,255,.02);border-radius:8px;color:var(--accent);font-size:11px}
+/* .login-panel: regras visuais e de comportamento deste componente. */
+.login-panel{padding:16px;border:1px solid var(--line);background:rgba(255,255,255,.015);border-radius:11px}
+/* .login-panel.hidden: regras visuais e de comportamento deste componente. */
+.login-panel.hidden{display:none}
+/* .login-panel-head h2: regras visuais e de comportamento deste componente. */
+.login-panel-head h2{margin:0 0 4px;font-size:15px}
+/* .login-panel-head p: regras visuais e de comportamento deste componente. */
+.login-panel-head p{margin:0 0 15px;color:var(--muted);font-size:11px;line-height:1.5}
+/* .login-primary-action: regras visuais e de comportamento deste componente. */
+.login-primary-action{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px;border-radius:9px;border:1px solid var(--accent);background:rgba(157,196,223,.08);color:var(--text)}
+/* .login-primary-action:hover: regras visuais e de comportamento deste componente. */
+.login-primary-action:hover{background:rgba(157,196,223,.14);transform:translateY(-1px)}
+/* .login-primary-action:active: regras visuais e de comportamento deste componente. */
+.login-primary-action:active{transform:scale(.985)}
+/* .login-action-icon: regras visuais e de comportamento deste componente. */
+.login-action-icon{width:34px;height:34px;display:grid;place-items:center;flex:0 0 34px;border-radius:8px;background:rgba(157,196,223,.09);color:var(--accent)}
+/* .login-action-icon svg: regras visuais e de comportamento deste componente. */
+.login-action-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* .login-primary-action strong,.login-primary-action small: regras visuais e de comportamento deste componente. */
+.login-primary-action strong,.login-primary-action small{display:block}
+/* .login-primary-action strong: regras visuais e de comportamento deste componente. */
+.login-primary-action strong{font-size:12px}
+/* .login-primary-action small: regras visuais e de comportamento deste componente. */
+.login-primary-action small{margin-top:2px;color:var(--muted);font-size:10px}
+/* .login-divider: regras visuais e de comportamento deste componente. */
+.login-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:10px}
+/* .login-divider:before,.login-divider:after: regras visuais e de comportamento deste componente. */
+.login-divider:before,.login-divider:after{content:"";height:1px;background:var(--line);flex:1}
+/* .login-form label: regras visuais e de comportamento deste componente. */
+.login-form label{display:block;margin-bottom:6px;font-size:11px;color:var(--text);font-weight:600}
+/* .login-form small: regras visuais e de comportamento deste componente. */
+.login-form small{display:block;color:var(--muted);font-size:10px;line-height:1.45;margin-top:7px}
+/* .login-input-row: regras visuais e de comportamento deste componente. */
+.login-input-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+/* .login-form input: regras visuais e de comportamento deste componente. */
+.login-form input{width:100%;min-height:40px;border:1px solid var(--line);border-radius:8px;background:#0e1419;color:var(--text);padding:8px 10px;font:600 15px/1.1 ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase;letter-spacing:.12em}
+/* .login-input-row button: regras visuais e de comportamento deste componente. */
+.login-input-row button{min-width:90px}
+/* .login-code-input: regras visuais e de comportamento deste componente. */
+.login-code-input{text-align:center;margin-bottom:10px}
+/* .login-note: regras visuais e de comportamento deste componente. */
+.login-note{margin-top:14px;color:var(--muted);font-size:10px;text-align:center}
+/* .room-code-badge: regras visuais e de comportamento deste componente. */
+.room-code-badge{display:none!important}
+/* .topbar-end-room: regras visuais e de comportamento deste componente. */
+.topbar-end-room{display:none!important}
+
+/* body.role-student .palette button,body.role-student #newArea,body.role-student #deleteArea,body.role-student #renameArea,body.role-student #areaType,body.role-student #applyRoom,body.role-student #roomW,body.role-student #roomH,body.role-student #applyProps,body.role-student #rotate,body.role-student #ctxDelete,body.role-student #ctxDuplicate,body.role-student #ctxRotate,body.role-student #ctxGroup,body.role-student #ctxUngroup,body.role-student #ctxLock,body.role-student #ctxHide,body.role-student #undo,body.role-student #redo,body.role-student #save,body.role-student #load,body.role-student #exportSvg: regras visuais e de comportamento deste componente. */
+body.role-student .palette button,body.role-student #newArea,body.role-student #deleteArea,body.role-student #renameArea,body.role-student #areaType,body.role-student #applyRoom,body.role-student #roomW,body.role-student #roomH,body.role-student #applyProps,body.role-student #rotate,body.role-student #ctxDelete,body.role-student #ctxDuplicate,body.role-student #ctxRotate,body.role-student #ctxGroup,body.role-student #ctxUngroup,body.role-student #ctxLock,body.role-student #ctxHide,body.role-student #undo,body.role-student #redo,body.role-student #save,body.role-student #load,body.role-student #exportSvg{pointer-events:none;opacity:.45}
+/* .student-mode-badge: regras visuais e de comportamento deste componente. */
+.student-mode-badge{display:inline-flex;align-items:center;padding:4px 8px;border:1px solid var(--line);border-radius:8px;color:var(--accent);font-size:10px;background:rgba(157,196,223,.06)}
+/* @media(max-width:620px): regras visuais e de comportamento deste componente. */
+@media(max-width:620px){.login-shell{padding:20px;border-radius:12px}
+/* .login-brand h1: regras visuais e de comportamento deste componente. */
+.login-brand h1{font-size:20px}
+/* .login-role-tabs: regras visuais e de comportamento deste componente. */
+.login-role-tabs{grid-template-columns:1fr}
+/* .login-input-row: regras visuais e de comportamento deste componente. */
+.login-input-row{grid-template-columns:1fr}
+/* .login-input-row button: regras visuais e de comportamento deste componente. */
+.login-input-row button{width:100%}}
+
+
+/* :root: regras visuais e de comportamento deste componente. */
+:root {
+  --bg: #0d1216;
+  --panel: #151b20;
+  --panel2: #1b2329;
+  --line: #33414a;
+  --text: #ffffff;
+  --muted: #a9b8c4;
+  --accent: #9dc4df;
+  --accent2: #b9d0de;
+  --sel: #d4a45b;
+  --danger: #b87878;
+  --warning: #ef4444;
+}
+
+
+/* *: regras visuais e de comportamento deste componente. */
+* {
+  box-sizing: border-box;
+}
+
+
+/* .hidden: regras visuais e de comportamento deste componente. */
+.hidden {
+  display: none !important;
+}
+
+
+/* html, body: regras visuais e de comportamento deste componente. */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0a0f13;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text);
+}
+
+
+/* :focus-visible: regras visuais e de comportamento deste componente. */
+:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px !important;
+}
+
+
+/* ::-webkit-scrollbar: regras visuais e de comportamento deste componente. */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* ::-webkit-scrollbar-track: regras visuais e de comportamento deste componente. */
+::-webkit-scrollbar-track {
+  background: #0d1216;
+}
+
+/* ::-webkit-scrollbar-thumb: regras visuais e de comportamento deste componente. */
+::-webkit-scrollbar-thumb {
+  background: #27333d;
+  border-radius: 3px;
+}
+
+/* ::-webkit-scrollbar-thumb:hover: regras visuais e de comportamento deste componente. */
+::-webkit-scrollbar-thumb:hover {
+  background: #3b4d5c;
+}
+
+
+/* .app: regras visuais e de comportamento deste componente. */
+.app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* .brand: regras visuais e de comportamento deste componente. */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: fit-content;
+}
+
+
+/* .brand-mark: regras visuais e de comportamento deste componente. */
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, rgba(157, 196, 223, 0.12), rgba(27, 35, 41, 0.8));
+  border: 1px solid rgba(157, 196, 223, 0.25);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+
+/* .brand-mark svg: regras visuais e de comportamento deste componente. */
+.brand-mark svg {
+  width: 22px;
+  height: 22px;
+}
+
+
+/* .brand strong: regras visuais e de comportamento deste componente. */
+.brand strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+
+/* .brand small: regras visuais e de comportamento deste componente. */
+.brand small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+
+/* .stepper: regras visuais e de comportamento deste componente. */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  flex: 1;
+  justify-content: center;
+  max-width: 380px;
+  background: rgba(10, 15, 19, 0.5);
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+
+/* .step: regras visuais e de comportamento deste componente. */
+.step {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 3px 2px;
+  margin: 0;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+
+/* .step:hover: regras visuais e de comportamento deste componente. */
+.step:hover {
+  color: var(--text);
+}
+
+
+/* .step:focus-visible: regras visuais e de comportamento deste componente. */
+.step:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+
+/* .step.pending: regras visuais e de comportamento deste componente. */
+.step.pending {
+  color: var(--muted);
+}
+
+
+/* .step.active: regras visuais e de comportamento deste componente. */
+.step.active {
+  color: var(--accent);
+}
+
+
+/* .step.done: regras visuais e de comportamento deste componente. */
+.step.done {
+  color: #4ade80;
+}
+
+
+/* .step .step-num: regras visuais e de comportamento deste componente. */
+.step .step-num {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+
+/* .step.done .step-num: regras visuais e de comportamento deste componente. */
+.step.done .step-num {
+  border-color: #4ade80;
+}
+
+
+/* .step-check: regras visuais e de comportamento deste componente. */
+.step-check {
+  display: none;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+
+/* .step.done .step-check: regras visuais e de comportamento deste componente. */
+.step.done .step-check {
+  display: inline-block;
+}
+
+
+/* .step b: regras visuais e de comportamento deste componente. */
+.step b {
+  font-weight: 600;
+}
+
+
+/* .stepper i: regras visuais e de comportamento deste componente. */
+.stepper i {
+  width: 20px;
+  border-top: 1px dashed var(--line);
+}
+
+
+/* header.topbar: regras visuais e de comportamento deste componente. */
+header.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  gap: 16px;
+  height: 60px;
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+/* .top-actions: regras visuais e de comportamento deste componente. */
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+/* button: regras visuais e de comportamento deste componente. */
+button {
+  font: inherit;
+  color: var(--text);
+  background: linear-gradient(180deg, #1e272e 0%, #161e24 100%);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+
+/* button svg: regras visuais e de comportamento deste componente. */
+button svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+
+/* button:hover: regras visuais e de comportamento deste componente. */
+button:hover {
+  background: linear-gradient(180deg, #26323a 0%, #1c272f 100%);
+  border-color: #4a5c68;
+}
+
+
+/* button.primary: regras visuais e de comportamento deste componente. */
+button.primary {
+  background: linear-gradient(180deg, #9dc4df 0%, #7da8c7 100%);
+  color: #0d1216;
+  border-color: #b9d0de;
+  font-weight: 600;
+}
+
+
+/* button.primary:hover: regras visuais e de comportamento deste componente. */
+button.primary:hover {
+  background: linear-gradient(180deg, #b0d3eb 0%, #8db8d6 100%);
+}
+
+
+/* button.danger-btn: regras visuais e de comportamento deste componente. */
+button.danger-btn {
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+
+/* button.danger-btn:hover: regras visuais e de comportamento deste componente. */
+button.danger-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+}
+
+
+/* .full: regras visuais e de comportamento deste componente. */
+.full {
+  width: 100%;
+}
+
+
+/* .workspace: regras visuais e de comportamento deste componente. */
+.workspace {
+  display: flex;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+
+/* PAINEL ESQUERDO */
+.left-panel {
+  width: 280px;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 16px;
+  overflow-y: auto;
+  z-index: 5;
+}
+
+
+/* .eyebrow: regras visuais e de comportamento deste componente. */
+.eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+
+/* .intro h1: regras visuais e de comportamento deste componente. */
+.intro h1 {
+  font-size: 18px;
+  margin: 2px 0 6px 0;
+  font-weight: 600;
+}
+
+
+/* .intro p: regras visuais e de comportamento deste componente. */
+.intro p {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+
+/* .room-card: regras visuais e de comportamento deste componente. */
+.room-card {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+
+/* .section-title: regras visuais e de comportamento deste componente. */
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+
+/* .dimension-grid: regras visuais e de comportamento deste componente. */
+.dimension-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+
+/* label: regras visuais e de comportamento deste componente. */
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+
+/* .input-unit: regras visuais e de comportamento deste componente. */
+.input-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+
+/* .input-unit input: regras visuais e de comportamento deste componente. */
+.input-unit input {
+  width: 100%;
+  padding-right: 22px;
+}
+
+
+/* .input-unit span: regras visuais e de comportamento deste componente. */
+.input-unit span {
+  position: absolute;
+  right: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+
+/* input[type="number"], input[type="text"]: regras visuais e de comportamento deste componente. */
+input[type="number"], input[type="text"] {
+  background: #0a0f13;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text);
+  padding: 6px 8px;
+  font-size: 12px;
+  outline: none;
+}
+
+
+/* input[type="number"]:focus, input[type="text"]:focus: regras visuais e de comportamento deste componente. */
+input[type="number"]:focus, input[type="text"]:focus {
+  border-color: var(--accent);
+}
+
+
+/* .feedback: regras visuais e de comportamento deste componente. */
+.feedback {
+  font-size: 11px;
+  color: var(--accent);
+  margin: 8px 0;
+}
+
+
+/* .room-actions: regras visuais e de comportamento deste componente. */
+.room-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+/* .palette: regras visuais e de comportamento deste componente. */
+.palette {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+
+/* .palette button: regras visuais e de comportamento deste componente. */
+.palette button {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px;
+  height: 60px;
+  background: var(--panel2);
+  text-align: left;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+
+/* .palette button .icon: regras visuais e de comportamento deste componente. */
+.palette button .icon {
+  display: flex;
+  align-items: center;
+  color: var(--accent);
+}
+
+
+/* .palette button b: regras visuais e de comportamento deste componente. */
+.palette button b {
+  font-size: 11px;
+  margin-top: auto;
+}
+
+
+/* .palette button small: regras visuais e de comportamento deste componente. */
+.palette button small {
+  font-size: 9px;
+  color: var(--muted);
+}
+
+
+/* .help-box: regras visuais e de comportamento deste componente. */
+.help-box {
+  background: rgba(157, 196, 223, 0.05);
+  border: 1px solid rgba(157, 196, 223, 0.15);
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+}
+
+
+/* .help-box strong: regras visuais e de comportamento deste componente. */
+.help-box strong {
+  font-size: 11px;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+
+
+/* .help-box span: regras visuais e de comportamento deste componente. */
+.help-box span {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+
+/* ÁREA CANVAS */
+.canvas-area {
+  flex: 1;
+  position: relative;
+  background: #0a0f13;
+  outline: none;
+}
+
+
+/* #canvas: regras visuais e de comportamento deste componente. */
+#canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+
+/* .canvas-toolbar: regras visuais e de comportamento deste componente. */
+.canvas-toolbar {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  z-index: 6;
+}
+
+
+/* .tool-group: regras visuais e de comportamento deste componente. */
+.tool-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-right: 1px solid var(--line);
+  padding-right: 6px;
+}
+
+
+/* .tool-group:last-child: regras visuais e de comportamento deste componente. */
+.tool-group:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+
+/* .canvas-toolbar button.active: regras visuais e de comportamento deste componente. */
+.canvas-toolbar button.active {
+  background: var(--accent);
+  color: #0d1216;
+  border-color: var(--accent2);
+}
+
+
+/* .zoom: regras visuais e de comportamento deste componente. */
+.zoom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+
+/* #zoomText: regras visuais e de comportamento deste componente. */
+#zoomText {
+  font-size: 11px;
+  min-width: 38px;
+  text-align: center;
+  color: var(--muted);
+}
+
+
+/* .contextual-toolbar: regras visuais e de comportamento deste componente. */
+.contextual-toolbar {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 6px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 6;
+  transition: all 0.2s ease;
+}
+
+
+/* .contextual-toolbar.hidden: regras visuais e de comportamento deste componente. */
+.contextual-toolbar.hidden {
+  display: none;
+}
+
+
+/* .canvas-help: regras visuais e de comportamento deste componente. */
+.canvas-help {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+
+/* PAINEL DIREITO */
+.right-panel {
+  width: 300px;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow-y: auto;
+  z-index: 5;
+}
+
+
+/* .selection-head h3: regras visuais e de comportamento deste componente. */
+.selection-head h3 {
+  font-size: 14px;
+  margin: 0;
+}
+
+
+/* .selection-head p: regras visuais e de comportamento deste componente. */
+.selection-head p {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 2px 0 12px 0;
+}
+
+
+/* .badge: regras visuais e de comportamento deste componente. */
+.badge {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  color: var(--accent);
+}
+
+
+/* .badge.complete: regras visuais e de comportamento deste componente. */
+.badge.complete {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: #22c55e;
+  color: #4ade80;
+}
+
+
+/* .prop-section: regras visuais e de comportamento deste componente. */
+.prop-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+/* .two: regras visuais e de comportamento deste componente. */
+.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+
+/* .rotation: regras visuais e de comportamento deste componente. */
+.rotation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* .rotation input: regras visuais e de comportamento deste componente. */
+.rotation input {
+  flex: 1;
+}
+
+
+/* .rotation output: regras visuais e de comportamento deste componente. */
+.rotation output {
+  font-size: 11px;
+  width: 30px;
+  text-align: right;
+  color: var(--accent);
+}
+
+
+/* .quick-actions: regras visuais e de comportamento deste componente. */
+.quick-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+
+/* .help-text: regras visuais e de comportamento deste componente. */
+.help-text {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 6px;
+}
+
+
+/* .validation-box: regras visuais e de comportamento deste componente. */
+.validation-box {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+
+/* .validation-box.hidden: regras visuais e de comportamento deste componente. */
+.validation-box.hidden {
+  display: none;
+}
+
+
+/* .validation-title: regras visuais e de comportamento deste componente. */
+.validation-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #fca5a5;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+
+/* .validation-list: regras visuais e de comportamento deste componente. */
+.validation-list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 10px;
+  color: #f87171;
+}
+
+
+/* .validation-list li: regras visuais e de comportamento deste componente. */
+.validation-list li {
+  margin-bottom: 2px;
+}
+
+
+/* ÁRVORE DE OBJETOS */
+.tree-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+
+/* .tree-header h3: regras visuais e de comportamento deste componente. */
+.tree-header h3 {
+  font-size: 12px;
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+
+/* .objects-tree: regras visuais e de comportamento deste componente. */
+.objects-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  outline: none;
+}
+
+
+/* .tree-group-item: regras visuais e de comportamento deste componente. */
+.tree-group-item {
+  margin-bottom: 6px;
+  border: 1px dashed var(--accent);
+  border-radius: 4px;
+  padding: 4px;
+  background: rgba(157, 196, 223, 0.05);
+}
+
+
+/* .tree-group-item .tree-item: regras visuais e de comportamento deste componente. */
+.tree-group-item .tree-item {
+  background: transparent;
+  border: none;
+  margin-bottom: 2px;
+}
+
+
+/* .tree-item: regras visuais e de comportamento deste componente. */
+.tree-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: var(--panel2);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+
+/* .tree-item:hover: regras visuais e de comportamento deste componente. */
+.tree-item:hover {
+  border-color: var(--line);
+}
+
+
+/* .tree-item.active: regras visuais e de comportamento deste componente. */
+.tree-item.active {
+  border-color: var(--sel);
+  background: rgba(212, 164, 91, 0.1);
+}
+
+
+/* .tree-item.has-error: regras visuais e de comportamento deste componente. */
+.tree-item.has-error {
+  border-color: #ef4444;
+}
+
+
+/* .tree-item.is-hidden: regras visuais e de comportamento deste componente. */
+.tree-item.is-hidden {
+  opacity: 0.5;
+}
+
+
+/* .tree-item-info: regras visuais e de comportamento deste componente. */
+.tree-item-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+
+/* .tree-item-info svg: regras visuais e de comportamento deste componente. */
+.tree-item-info svg {
+  flex-shrink: 0;
+}
+
+
+/* .tree-item-coords: regras visuais e de comportamento deste componente. */
+.tree-item-coords {
+  font-size: 9px;
+  color: var(--muted);
+}
+
+
+/* .tree-actions: regras visuais e de comportamento deste componente. */
+.tree-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+
+/* .tree-action-btn: regras visuais e de comportamento deste componente. */
+.tree-action-btn {
+  background: none;
+  border: none;
+  padding: 2px;
+  box-shadow: none;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+
+/* .tree-action-btn:hover: regras visuais e de comportamento deste componente. */
+.tree-action-btn:hover {
+  background: none;
+  opacity: 1;
+  color: var(--text);
+}
+
+
+/* .tree-action-btn.active: regras visuais e de comportamento deste componente. */
+.tree-action-btn.active {
+  color: var(--accent);
+  opacity: 1;
+}
+
+
+/* .tree-action-btn.active-lock: regras visuais e de comportamento deste componente. */
+.tree-action-btn.active-lock {
+  color: var(--sel);
+  opacity: 1;
+}
+
+
+/* RESUMO E COMPLIANCE */
+.risk-summary, .map-check {
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+
+/* .risk-list: regras visuais e de comportamento deste componente. */
+.risk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+
+/* .risk-row: regras visuais e de comportamento deste componente. */
+.risk-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  padding: 2px 0;
+}
+
+
+/* .risk-dot: regras visuais e de comportamento deste componente. */
+.risk-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+
+/* .check: regras visuais e de comportamento deste componente. */
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+
+/* .check span: regras visuais e de comportamento deste componente. */
+.check span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+}
+
+
+/* .check.ok: regras visuais e de comportamento deste componente. */
+.check.ok {
+  color: var(--text);
+}
+
+
+/* .check.ok span: regras visuais e de comportamento deste componente. */
+.check.ok span {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+
+/* .check.ok span::after: regras visuais e de comportamento deste componente. */
+.check.ok span::after {
+  content: "✓";
+  font-size: 8px;
+  color: #0d1216;
+  font-weight: bold;
+}
+
+
+/* TOASTS E MODAIS */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+
+/* .toast: regras visuais e de comportamento deste componente. */
+.toast {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  pointer-events: auto;
+}
+
+
+/* .toast-success: regras visuais e de comportamento deste componente. */
+.toast-success { border-color: #22c55e; color: #4ade80; }
+
+/* .toast-error: regras visuais e de comportamento deste componente. */
+.toast-error { border-color: #ef4444; color: #fca5a5; }
+
+/* .toast-info: regras visuais e de comportamento deste componente. */
+.toast-info { border-color: var(--accent); color: var(--accent2); }
+
+
+/* .modal-backdrop: regras visuais e de comportamento deste componente. */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+
+/* .modal-backdrop.hidden: regras visuais e de comportamento deste componente. */
+.modal-backdrop.hidden {
+  display: none;
+}
+
+
+/* .modal-backdrop:not(.hidden) .modal-card: regras visuais e de comportamento deste componente. */
+.modal-backdrop:not(.hidden) .modal-card {
+  animation: modalIn 160ms ease-out;
+}
+
+
+/* .modal-backdrop.closing .modal-card: regras visuais e de comportamento deste componente. */
+.modal-backdrop.closing .modal-card {
+  animation: modalOut 120ms ease-in forwards;
+}
+
+/* @keyframes modalIn: regras visuais e de comportamento deste componente. */
+@keyframes modalIn {
+/* from: regras visuais e de comportamento deste componente. */
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+
+/* to: regras visuais e de comportamento deste componente. */
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* @keyframes modalOut: regras visuais e de comportamento deste componente. */
+@keyframes modalOut {
+/* from: regras visuais e de comportamento deste componente. */
+  from { opacity: 1; transform: translateY(0) scale(1); }
+
+/* to: regras visuais e de comportamento deste componente. */
+  to { opacity: 0; transform: translateY(4px) scale(0.98); }
+}
+
+
+/* .confirm-modal-card: regras visuais e de comportamento deste componente. */
+.confirm-modal-card {
+  width: 440px;
+}
+
+
+/* .confirm-modal-card .modal-body p: regras visuais e de comportamento deste componente. */
+.confirm-modal-card .modal-body p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 13px;
+}
+
+
+/* .confirm-actions: regras visuais e de comportamento deste componente. */
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+
+.btn-secondary,
+/* .btn-danger: regras visuais e de comportamento deste componente. */
+.btn-danger {
+  min-width: 96px;
+}
+
+
+/* .btn-secondary: regras visuais e de comportamento deste componente. */
+.btn-secondary {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+
+/* .btn-secondary:hover: regras visuais e de comportamento deste componente. */
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent2);
+}
+
+
+/* .btn-danger: regras visuais e de comportamento deste componente. */
+.btn-danger {
+  background: #4a2323;
+  border: 1px solid #7c3a3a;
+  color: #fca5a5;
+}
+
+
+/* .btn-danger:hover: regras visuais e de comportamento deste componente. */
+.btn-danger:hover {
+  background: #5c2c2c;
+  border-color: #991b1b;
+  color: #fecaca;
+}
+
+/* @media (max-width: 540px): regras visuais e de comportamento deste componente. */
+@media (max-width: 540px) {
+/* .confirm-modal-card: regras visuais e de comportamento deste componente. */
+  .confirm-modal-card { width: min(92vw, 440px); }
+
+/* .confirm-actions: regras visuais e de comportamento deste componente. */
+  .confirm-actions { flex-direction: column-reverse; }
+
+/* .confirm-actions button: regras visuais e de comportamento deste componente. */
+  .confirm-actions button { width: 100%; }
+}
+
+
+/* .modal-card: regras visuais e de comportamento deste componente. */
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  width: 420px;
+  max-width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+
+/* .modal-header: regras visuais e de comportamento deste componente. */
+.modal-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+/* .modal-header h3: regras visuais e de comportamento deste componente. */
+.modal-header h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+
+/* .btn-close: regras visuais e de comportamento deste componente. */
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  box-shadow: none;
+}
+
+
+/* .modal-body: regras visuais e de comportamento deste componente. */
+.modal-body {
+  padding: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+
+/* .shortcuts-list: regras visuais e de comportamento deste componente. */
+.shortcuts-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
+/* .shortcuts-list li: regras visuais e de comportamento deste componente. */
+.shortcuts-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+
+/* kbd: regras visuais e de comportamento deste componente. */
+kbd {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: monospace;
+  color: var(--accent);
+}
+
+
+/* .mobile-nav-controls: regras visuais e de comportamento deste componente. */
+.mobile-nav-controls {
+  display: none;
+}
+
+/* @media (max-width: 768px): regras visuais e de comportamento deste componente. */
+@media (max-width: 768px) {
+/* .left-panel, .right-panel: regras visuais e de comportamento deste componente. */
+  .left-panel, .right-panel {
+    display: none;
+  }
+
+/* .stepper: regras visuais e de comportamento deste componente. */
+  .stepper {
+    display: none;
+  }
+
+/* .mobile-nav-controls: regras visuais e de comportamento deste componente. */
+  .mobile-nav-controls {
+    display: flex;
+    gap: 6px;
+  }
+}
+
+/* .area-manager: regras visuais e de comportamento deste componente. */
+.area-manager {
+  margin: 0 0 14px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,.025);
+}
+
+/* .area-manager label: regras visuais e de comportamento deste componente. */
+.area-manager label { display:block; margin-top:8px; }
+
+/* .area-manager select, .area-manager input: regras visuais e de comportamento deste componente. */
+.area-manager select, .area-manager input { width:100%; box-sizing:border-box; }
+
+/* .area-name-row: regras visuais e de comportamento deste componente. */
+.area-name-row { display:grid; grid-template-columns:1fr auto; gap:6px; margin-top:8px; }
+
+/* .area-actions: regras visuais e de comportamento deste componente. */
+.area-actions { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; margin-top:8px; }
+
+/* .area-meta: regras visuais e de comportamento deste componente. */
+.area-meta { margin-top:8px; color:var(--muted); font-size:11px; }
+/* @media (max-width: 820px): regras visuais e de comportamento deste componente. */
+@media (max-width: 820px) { .area-actions { grid-template-columns:1fr; } }
+
+
+/* Tela inicial (Hub) */
+.home-screen {
+  position: fixed; inset: 0; z-index: 500; display: flex; align-items: center; justify-content: center;
+  overflow: auto; padding: 32px 20px; background:
+    radial-gradient(circle at 20% 10%, rgba(157,196,223,.08), transparent 28%),
+    radial-gradient(circle at 80% 80%, rgba(56,189,248,.05), transparent 30%), var(--bg);
+}
+
+/* .home-screen.hidden: regras visuais e de comportamento deste componente. */
+.home-screen.hidden { display: none; }
+
+/* .home-content: regras visuais e de comportamento deste componente. */
+.home-content { width: min(720px, 100%); }
+
+/* .home-brand: regras visuais e de comportamento deste componente. */
+.home-brand { display:flex; align-items:center; gap:18px; margin-bottom:20px; }
+
+/* .home-brand-mark: regras visuais e de comportamento deste componente. */
+.home-brand-mark { width:58px; height:58px; display:grid; place-items:center; flex:0 0 auto; border:1px solid rgba(157,196,223,.28); border-radius:14px; color:var(--accent); background:linear-gradient(145deg, rgba(157,196,223,.12), rgba(255,255,255,.025)); box-shadow:0 12px 30px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.06); }
+
+/* .home-brand-mark svg: regras visuais e de comportamento deste componente. */
+.home-brand-mark svg { width:32px; height:32px; }
+
+/* .home-eyebrow: regras visuais e de comportamento deste componente. */
+.home-eyebrow { display:block; color:var(--accent2); font-size:10px; font-weight:700; letter-spacing:.16em; margin-bottom:7px; }
+
+/* .home-brand h1: regras visuais e de comportamento deste componente. */
+.home-brand h1 { margin:0; font-size:clamp(28px,4vw,44px); line-height:1.05; letter-spacing:-.02em; }
+
+/* .home-brand p: regras visuais e de comportamento deste componente. */
+.home-brand p { margin:9px 0 0; color:var(--muted); font-size:13px; max-width:760px; line-height:1.55; }
+
+/* .home-start-title: regras visuais e de comportamento deste componente. */
+.home-start-title { margin:0 0 12px; font-size:14px; color:var(--text); }
+
+/* .home-actions: regras visuais e de comportamento deste componente. */
+.home-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+
+/* .home-card: regras visuais e de comportamento deste componente. */
+.home-card {
+  min-height:185px; overflow-wrap:break-word; word-break:break-word; padding:18px; display:flex; flex-direction:column;
+  align-items:flex-start; text-align:left; gap:9px; color:var(--text); background:var(--panel2); border:1px solid var(--line);
+  border-radius:12px; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,.14);
+  transition:transform .16s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease;
+}
+
+/* .home-card-primary: regras visuais e de comportamento deste componente. */
+.home-card-primary { min-height:185px; border-color:rgba(157,196,223,.55); color:#0d1216; background:linear-gradient(180deg, #b9d0de, #9dc4df); }
+
+/* .home-card-primary .home-icon: regras visuais e de comportamento deste componente. */
+.home-card-primary .home-icon { color:#0d1216; border-color:rgba(13,18,22,.18); background:rgba(255,255,255,.24); }
+
+/* .home-card-primary small: regras visuais e de comportamento deste componente. */
+.home-card-primary small { color:#33414a; }
+
+/* .home-card-secondary: regras visuais e de comportamento deste componente. */
+.home-card-secondary { min-height:132px; padding:14px; }
+
+/* .home-card:hover,.home-card:focus-visible: regras visuais e de comportamento deste componente. */
+.home-card:hover,.home-card:focus-visible { transform:translateY(-3px); border-color:var(--accent); background:linear-gradient(180deg, rgba(157,196,223,.10), var(--panel2)); box-shadow:0 14px 30px rgba(0,0,0,.24); outline:none; }
+
+/* .home-card:active: regras visuais e de comportamento deste componente. */
+.home-card:active { transform:scale(.985); }
+
+/* .home-card-primary:hover,.home-card-primary:focus-visible: regras visuais e de comportamento deste componente. */
+.home-card-primary:hover,.home-card-primary:focus-visible { background:linear-gradient(180deg, rgba(157,196,223,.20), rgba(157,196,223,.08)), var(--panel2); }
+
+/* .home-icon: regras visuais e de comportamento deste componente. */
+.home-icon { width:44px; height:44px; display:grid; place-items:center; border:1px solid rgba(157,196,223,.22); border-radius:10px; color:var(--accent); background:rgba(157,196,223,.07); transition:transform .16s ease; }
+
+/* .home-card:hover .home-icon,.home-card:focus-visible .home-icon: regras visuais e de comportamento deste componente. */
+.home-card:hover .home-icon,.home-card:focus-visible .home-icon { transform:translateY(-2px); }
+
+/* .home-icon svg: regras visuais e de comportamento deste componente. */
+.home-icon svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+
+/* .home-card strong: regras visuais e de comportamento deste componente. */
+.home-card strong { font-size:15px; }
+
+/* .home-card small: regras visuais e de comportamento deste componente. */
+.home-card small { color:var(--muted); font-size:11px; line-height:1.6; margin-top:auto; overflow:visible; white-space:normal; overflow-wrap:anywhere; }
+
+/* .home-recent: regras visuais e de comportamento deste componente. */
+.home-recent { margin:0 0 16px; padding:14px; border:1px solid rgba(157,196,223,.42); border-radius:12px; background:linear-gradient(180deg, rgba(157,196,223,.08), rgba(255,255,255,.02)); }
+
+/* .home-recent[hidden]: regras visuais e de comportamento deste componente. */
+.home-recent[hidden] { display:none; }
+
+/* .home-recent-head: regras visuais e de comportamento deste componente. */
+.home-recent-head { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+
+/* .home-recent h2: regras visuais e de comportamento deste componente. */
+.home-recent h2 { margin:0; font-size:14px; }
+
+/* .home-recent p: regras visuais e de comportamento deste componente. */
+.home-recent p { margin:4px 0 0; color:var(--muted); font-size:11px; }
+
+/* .recent-list: regras visuais e de comportamento deste componente. */
+.recent-list { margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; }
+
+/* .recent-chip: regras visuais e de comportamento deste componente. */
+.recent-chip { padding:7px 9px; border:1px solid var(--line); border-radius:8px; color:var(--muted); background:var(--panel2); font-size:11px; }
+
+/* .home-continue: regras visuais e de comportamento deste componente. */
+.home-continue { border-color:rgba(157,196,223,.44); color:var(--text); background:rgba(157,196,223,.10); }
+
+/* .home-continue:hover,.home-continue:focus-visible: regras visuais e de comportamento deste componente. */
+.home-continue:hover,.home-continue:focus-visible { border-color:var(--accent); background:rgba(157,196,223,.16); }
+/* @media (max-width: 900px): regras visuais e de comportamento deste componente. */
+@media (max-width: 900px) {
+/* .home-content: regras visuais e de comportamento deste componente. */
+  .home-content { width:min(680px,100%); }
+}
+/* @media (max-width: 620px): regras visuais e de comportamento deste componente. */
+@media (max-width: 620px) {
+/* .home-screen: regras visuais e de comportamento deste componente. */
+  .home-screen { align-items:flex-start; padding:24px 14px; }
+
+/* .home-content: regras visuais e de comportamento deste componente. */
+  .home-content { width:100%; }
+
+/* .home-brand: regras visuais e de comportamento deste componente. */
+  .home-brand { align-items:flex-start; }
+
+/* .home-brand-mark: regras visuais e de comportamento deste componente. */
+  .home-brand-mark { width:48px; height:48px; border-radius:11px; }
+
+/* .home-brand-mark svg: regras visuais e de comportamento deste componente. */
+  .home-brand-mark svg { width:27px; height:27px; }
+
+/* .home-actions: regras visuais e de comportamento deste componente. */
+  .home-actions { grid-template-columns:repeat(2,minmax(0,1fr)); }
+
+/* .home-card: regras visuais e de comportamento deste componente. */
+  .home-card { min-height:150px; padding:14px; }
+
+/* .home-card-primary: regras visuais e de comportamento deste componente. */
+  .home-card-primary { min-height:155px; }
+
+/* .home-card-secondary: regras visuais e de comportamento deste componente. */
+  .home-card-secondary { min-height:120px; }
+
+/* .home-recent-head: regras visuais e de comportamento deste componente. */
+  .home-recent-head { flex-direction:column; align-items:stretch; }
+
+/* .home-continue: regras visuais e de comportamento deste componente. */
+  .home-continue { width:100%; }
+}
+/* @media (max-width: 400px): regras visuais e de comportamento deste componente. */
+@media (max-width: 400px) {
+/* .home-actions: regras visuais e de comportamento deste componente. */
+  .home-actions { grid-template-columns:1fr; }
+
+/* .home-card, .home-card-primary, .home-card-secondary: regras visuais e de comportamento deste componente. */
+  .home-card, .home-card-primary, .home-card-secondary { min-height:145px; }
+}
+
+
+/* Feedback visual do stepper */
+.step.highlight {
+  animation: stepPulse 1.8s ease;
+}
+
+/* @keyframes stepPulse: regras visuais e de comportamento deste componente. */
+@keyframes stepPulse {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; background: transparent; }
+
+  18%, 55% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+}
+
+
+/* Destaque dos painéis ao usar o stepper */
+.highlight {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+
+/* .report-modal-card: regras visuais e de comportamento deste componente. */
+.report-modal-card { width: 520px; max-width: 92%; }
+
+/* .report-summary: regras visuais e de comportamento deste componente. */
+.report-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+
+/* .report-stat: regras visuais e de comportamento deste componente. */
+.report-stat { background:var(--panel2); border:1px solid var(--line); border-radius:6px; padding:10px; text-align:center; }
+
+/* .report-stat b: regras visuais e de comportamento deste componente. */
+.report-stat b { display:block; font-size:20px; color:var(--text); }
+
+/* .report-stat span: regras visuais e de comportamento deste componente. */
+.report-stat span { color:var(--muted); font-size:10px; }
+
+/* .report-list: regras visuais e de comportamento deste componente. */
+.report-list { display:flex; flex-direction:column; gap:6px; }
+
+/* .report-row: regras visuais e de comportamento deste componente. */
+.report-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 10px; background:var(--panel2); border:1px solid var(--line); border-radius:6px; }
+
+/* .report-row strong: regras visuais e de comportamento deste componente. */
+.report-row strong { display:block; font-size:12px; }
+
+/* .report-row small: regras visuais e de comportamento deste componente. */
+.report-row small { display:block; margin-top:2px; color:var(--muted); font-size:10px; }
+
+/* .report-score: regras visuais e de comportamento deste componente. */
+.report-score { min-width:48px; text-align:center; padding:4px 7px; border-radius:999px; font-weight:700; font-size:11px; }
+
+/* .report-score.ok: regras visuais e de comportamento deste componente. */
+.report-score.ok { color:#4ade80; background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.35); }
+
+/* .report-score.pending: regras visuais e de comportamento deste componente. */
+.report-score.pending { color:#fbbf24; background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.25); }
+
+
+
+/* Menu de Modelos */
+.models-modal-card { width: min(920px, 94vw); max-width: 94vw; }
+
+/* .models-intro: regras visuais e de comportamento deste componente. */
+.models-intro { margin: 0 0 14px; color: var(--muted); font-size: 12px; }
+
+/* .models-grid: regras visuais e de comportamento deste componente. */
+.models-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
+
+/* .model-card: regras visuais e de comportamento deste componente. */
+.model-card { display:flex; flex-direction:column; align-items:flex-start; gap:7px; text-align:left; padding:14px; min-height:190px; border:1px solid var(--line); border-radius:10px; background:var(--panel2); color:var(--text); cursor:pointer; transition:border-color .16s ease, transform .16s ease, background .16s ease; }
+
+/* .model-card:hover, .model-card:focus-visible: regras visuais e de comportamento deste componente. */
+.model-card:hover, .model-card:focus-visible { border-color:var(--accent); background:rgba(56,189,248,.06); transform:translateY(-1px); outline:none; }
+
+/* .model-thumb: regras visuais e de comportamento deste componente. */
+.model-thumb { width:100%; height:78px; display:grid; place-items:center; border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,.025); color:var(--accent2); }
+
+/* .model-thumb svg: regras visuais e de comportamento deste componente. */
+.model-thumb svg { width:110px; height:78px; }
+
+/* .model-card strong: regras visuais e de comportamento deste componente. */
+.model-card strong { font-size:13px; }
+
+/* .model-card small: regras visuais e de comportamento deste componente. */
+.model-card small { color:var(--muted); font-size:11px; line-height:1.5; white-space:normal; overflow:visible; overflow-wrap:anywhere; word-break:break-word; }
+
+/* .model-card-action: regras visuais e de comportamento deste componente. */
+.model-card-action { margin-top:auto; color:var(--accent2); font-size:11px; font-weight:700; }
+
+/* .models-footer: regras visuais e de comportamento deste componente. */
+.models-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; padding-top:12px; border-top:1px solid var(--line); }
+/* @media (max-width: 720px): regras visuais e de comportamento deste componente. */
+@media (max-width: 720px) { .models-grid { grid-template-columns:1fr; }
+/* .models-footer: regras visuais e de comportamento deste componente. */
+ .models-footer { flex-direction:column; }
+/* .models-footer button: regras visuais e de comportamento deste componente. */
+ .models-footer button { width:100%; } }
+/* @media (max-width: 820px): regras visuais e de comportamento deste componente. */
+@media (max-width: 820px) { .area-actions { grid-template-columns:1fr; } }
+
+
+
+
+/* F26 — rolagem independente dos painéis laterais */
+.left-panel::-webkit-scrollbar,
+.right-panel::-webkit-scrollbar,
+/* .panel-tab-content::-webkit-scrollbar: regras visuais e de comportamento deste componente. */
+.panel-tab-content::-webkit-scrollbar { width:8px; height:8px; }
+
+.left-panel::-webkit-scrollbar-track,
+.right-panel::-webkit-scrollbar-track,
+/* .panel-tab-content::-webkit-scrollbar-track: regras visuais e de comportamento deste componente. */
+.panel-tab-content::-webkit-scrollbar-track { background:rgba(255,255,255,.025); }
+
+.left-panel::-webkit-scrollbar-thumb,
+.right-panel::-webkit-scrollbar-thumb,
+/* .panel-tab-content::-webkit-scrollbar-thumb: regras visuais e de comportamento deste componente. */
+.panel-tab-content::-webkit-scrollbar-thumb { background:rgba(157,196,223,.28); border-radius:8px; border:2px solid transparent; background-clip:padding-box; }
+
+.left-panel::-webkit-scrollbar-thumb:hover,
+.right-panel::-webkit-scrollbar-thumb:hover,
+/* .panel-tab-content::-webkit-scrollbar-thumb:hover: regras visuais e de comportamento deste componente. */
+.panel-tab-content::-webkit-scrollbar-thumb:hover { background:rgba(157,196,223,.45); border:2px solid transparent; background-clip:padding-box; }
+
+
+/* Garante que o conteúdo das seções possa crescer sem romper o cálculo de altura do painel. */
+.left-panel > .panel-section,
+/* .left-panel > details.panel-section: regras visuais e de comportamento deste componente. */
+.left-panel > details.panel-section { flex:0 0 auto; min-height:0; }
+
+/* .left-panel .panel-section[open] .panel-section-body: regras visuais e de comportamento deste componente. */
+.left-panel .panel-section[open] .panel-section-body { min-height:0; }
+
+
+/* === FRENTE 22 — Remodelação de UI e navegação === */
+header.topbar { height:50px; padding:0 12px; gap:10px; }
+
+/* .topbar-icon-btn: regras visuais e de comportamento deste componente. */
+.topbar-icon-btn { width:34px; height:34px; padding:6px; border-radius:7px; flex:0 0 auto; }
+
+/* .topbar-icon-btn svg: regras visuais e de comportamento deste componente. */
+.topbar-icon-btn svg { width:18px; height:18px; }
+
+/* .project-name: regras visuais e de comportamento deste componente. */
+.project-name { display:inline-flex; align-items:center; min-width:120px; max-width:220px; padding:5px 10px; border-left:1px solid var(--line); color:var(--text); font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* .area-switcher: regras visuais e de comportamento deste componente. */
+.area-switcher { display:flex; align-items:center; gap:6px; min-width:210px; max-width:260px; padding:4px 6px 4px 8px; background:var(--panel2); border:1px solid var(--line); border-radius:7px; }
+
+/* .area-switcher-label: regras visuais e de comportamento deste componente. */
+.area-switcher-label { font-size:9px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700; }
+
+/* .area-switcher select: regras visuais e de comportamento deste componente. */
+.area-switcher select { flex:1; min-width:0; background:transparent; border:0; color:var(--text); outline:none; font-size:11px; }
+
+/* .top-action-group: regras visuais e de comportamento deste componente. */
+.top-action-group { display:flex; align-items:center; gap:4px; padding-left:6px; border-left:1px solid var(--line); }
+
+/* .top-action-edit: regras visuais e de comportamento deste componente. */
+.top-action-edit { margin-left:auto; }
+
+/* .top-action-file button: regras visuais e de comportamento deste componente. */
+.top-action-file button { padding:6px 8px; }
+
+/* .stepper: regras visuais e de comportamento deste componente. */
+.stepper { max-width:330px; padding:4px 10px; gap:8px; background:transparent; border:0; }
+
+/* .stepper i: regras visuais e de comportamento deste componente. */
+.stepper i { width:14px; }
+
+/* .step b: regras visuais e de comportamento deste componente. */
+.step b { font-size:10px; }
+
+/* .step .step-num: regras visuais e de comportamento deste componente. */
+.step .step-num { width:17px; height:17px; font-size:9px; }
+
+/* .workspace: regras visuais e de comportamento deste componente. */
+.workspace { min-width:0; }
+
+/* .left-panel: regras visuais e de comportamento deste componente. */
+.left-panel {
+  width:280px;
+  flex:0 0 280px;
+  min-width:0;
+  min-height:0;
+  height:100%;
+  max-height:100%;
+  box-sizing:border-box;
+  padding:10px;
+  gap:8px;
+  background:var(--panel);
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-gutter:stable;
+  scrollbar-width:thin;
+}
+
+/* .panel-section: regras visuais e de comportamento deste componente. */
+.panel-section { border:1px solid var(--line); border-radius:8px; background:var(--panel2); overflow:hidden; }
+
+/* .panel-section[open]: regras visuais e de comportamento deste componente. */
+.panel-section[open] { border-color:rgba(157,196,223,.28); }
+
+/* .panel-section summary: regras visuais e de comportamento deste componente. */
+.panel-section summary { list-style:none; }
+
+/* .panel-section summary::-webkit-details-marker: regras visuais e de comportamento deste componente. */
+.panel-section summary::-webkit-details-marker { display:none; }
+
+/* .panel-section-head: regras visuais e de comportamento deste componente. */
+.panel-section-head { display:grid; grid-template-columns:20px 1fr 14px; align-items:center; gap:7px; min-height:38px; padding:7px 10px; cursor:pointer; user-select:none; background:rgba(255,255,255,.025); border-bottom:1px solid transparent; }
+
+/* .panel-section[open] .panel-section-head: regras visuais e de comportamento deste componente. */
+.panel-section[open] .panel-section-head { border-bottom-color:var(--line); color:var(--accent); }
+
+/* .panel-section-icon: regras visuais e de comportamento deste componente. */
+.panel-section-icon { display:grid; place-items:center; color:var(--accent); }
+
+/* .panel-section-icon svg: regras visuais e de comportamento deste componente. */
+.panel-section-icon svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+
+/* .panel-section-title: regras visuais e de comportamento deste componente. */
+.panel-section-title { font-size:11px; text-transform:uppercase; letter-spacing:.06em; font-weight:700; }
+
+/* .panel-section-chevron: regras visuais e de comportamento deste componente. */
+.panel-section-chevron { font-size:18px; color:var(--muted); transform:rotate(0deg); transition:transform .16s ease; text-align:center; }
+
+/* .panel-section[open] .panel-section-chevron: regras visuais e de comportamento deste componente. */
+.panel-section[open] .panel-section-chevron { transform:rotate(90deg); }
+
+/* .panel-section-body: regras visuais e de comportamento deste componente. */
+.panel-section-body { padding:10px; }
+
+/* .panel-section-project .intro: regras visuais e de comportamento deste componente. */
+.panel-section-project .intro { margin-bottom:12px; }
+
+/* .panel-section-project .area-manager: regras visuais e de comportamento deste componente. */
+.panel-section-project .area-manager { margin:0 0 10px; background:transparent; border:0; padding:0; }
+
+/* .panel-section-project .room-card: regras visuais e de comportamento deste componente. */
+.panel-section-project .room-card { margin-top:6px; }
+
+/* .palette-group: regras visuais e de comportamento deste componente. */
+.palette-group { padding:0; margin:0; background:transparent; border:0; }
+
+/* .left-panel .help-box: regras visuais e de comportamento deste componente. */
+.left-panel .help-box { margin:0; background:transparent; border:0; padding:0; }
+
+/* .right-panel: regras visuais e de comportamento deste componente. */
+.right-panel {
+  width:320px;
+  flex:0 0 320px;
+  min-width:0;
+  min-height:0;
+  height:100%;
+  max-height:100%;
+  box-sizing:border-box;
+  padding:0;
+  gap:0;
+  background:var(--panel);
+  overflow:hidden;
+}
+
+/* .panel-tabs: regras visuais e de comportamento deste componente. */
+.panel-tabs { height:36px; flex:0 0 auto; display:grid; grid-template-columns:repeat(3,1fr); border-bottom:1px solid var(--line); background:var(--panel); }
+
+/* .panel-tab: regras visuais e de comportamento deste componente. */
+.panel-tab { border:0; border-radius:0; background:transparent; box-shadow:none; min-width:0; padding:6px 7px; color:var(--muted); font-size:10px; gap:5px; }
+
+/* .panel-tab:hover: regras visuais e de comportamento deste componente. */
+.panel-tab:hover { background:var(--panel2); border-color:transparent; }
+
+/* .panel-tab[aria-selected="true"]: regras visuais e de comportamento deste componente. */
+.panel-tab[aria-selected="true"] { color:var(--accent); background:var(--panel2); border-bottom:2px solid var(--accent); }
+
+/* .tab-badge: regras visuais e de comportamento deste componente. */
+.tab-badge { min-width:18px; padding:1px 5px; border-radius:9px; border:1px solid var(--line); background:rgba(255,255,255,.03); font-size:9px; line-height:1.3; color:inherit; }
+
+/* .panel-tab-content: regras visuais e de comportamento deste componente. */
+.panel-tab-content { flex:1 1 auto; min-height:0; overflow-y:auto; padding:12px; }
+
+/* .panel-tab-content[hidden]: regras visuais e de comportamento deste componente. */
+.panel-tab-content[hidden] { display:none !important; }
+
+/* .panel-tab-content .risk-summary, .panel-tab-content .map-check: regras visuais e de comportamento deste componente. */
+.panel-tab-content .risk-summary, .panel-tab-content .map-check { margin-top:12px; }
+/* @media (max-width:1180px): regras visuais e de comportamento deste componente. */
+@media (max-width:1180px){ .project-name{max-width:150px;}
+/* .area-switcher: regras visuais e de comportamento deste componente. */
+ .area-switcher{min-width:170px;}
+/* .top-action-file button span: regras visuais e de comportamento deste componente. */
+ .top-action-file button span{display:none;} }
+/* @media (max-width:900px): regras visuais e de comportamento deste componente. */
+@media (max-width:900px){ header.topbar{padding:0 8px;gap:6px;}
+/* .brand > div:last-child: regras visuais e de comportamento deste componente. */
+ .brand>div:last-child{display:none;}
+/* .project-name: regras visuais e de comportamento deste componente. */
+ .project-name{min-width:90px;max-width:120px;}
+/* .area-switcher: regras visuais e de comportamento deste componente. */
+ .area-switcher{min-width:140px;}
+/* .stepper: regras visuais e de comportamento deste componente. */
+ .stepper{max-width:220px;gap:5px;padding:2px 4px;}
+/* .step b: regras visuais e de comportamento deste componente. */
+ .step b{display:none;}
+/* .top-action-edit: regras visuais e de comportamento deste componente. */
+ .top-action-edit{margin-left:0;} }
+/* @media (max-width:768px): regras visuais e de comportamento deste componente. */
+@media (max-width:768px){
+/* .project-name,.stepper,.top-actions: regras visuais e de comportamento deste componente. */
+  .project-name,.stepper,.top-actions{display:none;}
+
+/* .area-switcher: regras visuais e de comportamento deste componente. */
+  .area-switcher{display:flex; min-width:120px; max-width:150px; flex:0 1 150px; padding:3px 5px; margin-left:auto;}
+
+/* .area-switcher-label: regras visuais e de comportamento deste componente. */
+  .area-switcher-label{display:none;}
+
+/* .area-switcher select: regras visuais e de comportamento deste componente. */
+  .area-switcher select{font-size:10px;}
+
+/* header.topbar: regras visuais e de comportamento deste componente. */
+  header.topbar{justify-content:space-between; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden;}
+
+/* header.topbar > *: regras visuais e de comportamento deste componente. */
+  header.topbar > *{flex:0 0 auto;}
+}
+
+
+/* Alertas de validação permanecem visíveis independentemente da aba ativa. */
+.validation-box-global {
+  margin: 8px 10px 0;
+  position: relative;
+  z-index: 2;
+}
+
+
+/* Correção F25 — painéis recolhíveis responsivos e drawers móveis */
+.mobile-panel-header {
+  display: none;
+}
+
+/* .mobile-panel-backdrop: regras visuais e de comportamento deste componente. */
+.mobile-panel-backdrop {
+  display: none;
+}
+
+
+.panel-section,
+.panel-section-body,
+/* .palette-group: regras visuais e de comportamento deste componente. */
+.palette-group {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+
+/* .panel-section-body: regras visuais e de comportamento deste componente. */
+.panel-section-body {
+  overflow: visible;
+}
+
+
+/* .palette-group: regras visuais e de comportamento deste componente. */
+.palette-group {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* @media (max-width: 768px): regras visuais e de comportamento deste componente. */
+@media (max-width: 768px) {
+/* .mobile-panel-backdrop: regras visuais e de comportamento deste componente. */
+  .mobile-panel-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    display: block;
+    background: rgba(0,0,0,.48);
+    backdrop-filter: blur(1px);
+  }
+
+/* .mobile-panel-backdrop[hidden]: regras visuais e de comportamento deste componente. */
+  .mobile-panel-backdrop[hidden] { display: none; }
+
+
+/* .mobile-panel-header: regras visuais e de comportamento deste componente. */
+  .mobile-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex: 0 0 44px;
+    padding: 8px 10px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 3;
+  }
+
+
+/* .mobile-panel-header strong: regras visuais e de comportamento deste componente. */
+  .mobile-panel-header strong {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--muted);
+  }
+
+
+/* .mobile-panel-close: regras visuais e de comportamento deste componente. */
+  .mobile-panel-close {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 7px;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+
+  .left-panel,
+/* .right-panel: regras visuais e de comportamento deste componente. */
+  .right-panel {
+    display: flex;
+    position: fixed;
+    height: calc(100dvh - 50px);
+    max-height: calc(100dvh - 50px);
+    top: 50px;
+    bottom: 0;
+    z-index: 40;
+    max-height: calc(100dvh - 50px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 14px 32px rgba(0,0,0,.38);
+    transition: transform .18s ease, visibility .18s ease;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+
+/* .left-panel: regras visuais e de comportamento deste componente. */
+  .left-panel {
+    left: 0;
+    width: min(88vw, 340px);
+    transform: translateX(-102%);
+  }
+
+
+/* .right-panel: regras visuais e de comportamento deste componente. */
+  .right-panel {
+    right: 0;
+    width: min(92vw, 360px);
+    transform: translateX(102%);
+  }
+
+
+  .left-panel.mobile-open,
+/* .right-panel.mobile-open: regras visuais e de comportamento deste componente. */
+  .right-panel.mobile-open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+
+/* .left-panel .panel-section: regras visuais e de comportamento deste componente. */
+  .left-panel .panel-section {
+    flex: 0 0 auto;
+    margin-bottom: 8px;
+  }
+
+
+/* .left-panel .panel-section:last-child: regras visuais e de comportamento deste componente. */
+  .left-panel .panel-section:last-child {
+    margin-bottom: 16px;
+  }
+
+
+/* .panel-section-head: regras visuais e de comportamento deste componente. */
+  .panel-section-head {
+    min-height: 42px;
+    padding: 8px 10px;
+  }
+
+
+/* .panel-section-body: regras visuais e de comportamento deste componente. */
+  .panel-section-body {
+    padding: 10px;
+  }
+
+
+/* .palette-group: regras visuais e de comportamento deste componente. */
+  .palette-group {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+
+/* .palette button: regras visuais e de comportamento deste componente. */
+  .palette button {
+    min-width: 0;
+    height: auto;
+    min-height: 68px;
+  }
+
+
+/* .panel-tabs: regras visuais e de comportamento deste componente. */
+  .panel-tabs {
+    position: sticky;
+    top: 44px;
+    z-index: 2;
+  }
+
+
+/* .panel-tab-content: regras visuais e de comportamento deste componente. */
+  .panel-tab-content {
+    padding: 10px;
+  }
+}
+
+/* @media (max-width: 420px): regras visuais e de comportamento deste componente. */
+@media (max-width: 420px) {
+/* .left-panel: regras visuais e de comportamento deste componente. */
+  .left-panel { width: 92vw; }
+
+/* .right-panel: regras visuais e de comportamento deste componente. */
+  .right-panel { width: 94vw; }
+
+/* .palette-group: regras visuais e de comportamento deste componente. */
+  .palette-group { grid-template-columns: 1fr; }
+
+/* .palette button: regras visuais e de comportamento deste componente. */
+  .palette button { min-height: 60px; }
+
+/* .panel-section-head: regras visuais e de comportamento deste componente. */
+  .panel-section-head { min-height: 40px; }
+}
+
+/* .login-screen.hidden: regras visuais e de comportamento deste componente. */
+.login-screen.hidden{display:none!important}
+
+/* .has-room-session .room-code-badge: regras visuais e de comportamento deste componente. */
+.has-room-session .room-code-badge{display:inline-flex!important;align-items:center;gap:6px;min-height:30px;padding:4px 9px;border:1px solid var(--line);border-radius:8px;background:rgba(157,196,223,.05);color:var(--accent);font-size:10px;cursor:pointer}
+
+/* .has-room-session .room-code-badge strong: regras visuais e de comportamento deste componente. */
+.has-room-session .room-code-badge strong{font:700 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+
+/* .has-room-session .topbar-end-room:not([hidden]): regras visuais e de comportamento deste componente. */
+.has-room-session .topbar-end-room:not([hidden]){display:inline-flex!important}
+
+/* body.role-student .topbar-end-room: regras visuais e de comportamento deste componente. */
+body.role-student .topbar-end-room{display:none!important}
+/* @media(max-width:900px): regras visuais e de comportamento deste componente. */
+@media(max-width:900px){.has-room-session .room-code-badge{font-size:9px;padding:4px 7px}
+/* .has-room-session .room-code-badge strong: regras visuais e de comportamento deste componente. */
+.has-room-session .room-code-badge strong{font-size:10px}}
+
+/* FRENTE 34 — autenticação Google e salas do usuário. */
+.google-login-panel {
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255,255,255,.025);
+  text-align: center;
+}
+.google-login-panel h2 { margin: 0 0 5px; font-size: 15px; }
+.google-login-panel p { margin: 0 0 12px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+#googleSignInButton { min-height: 44px; display: flex; justify-content: center; align-items: center; }
+.google-user-status, .google-config-warning { margin-top: 10px; color: var(--muted); font-size: 11px; }
+.google-config-warning { color: #fbbf24; }
+.topbar-text-btn {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  color: var(--text);
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.room-list-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px;
+  background: var(--panel2);
+}
+.room-list-item + .room-list-item { margin-top: 7px; }
+.room-list-item > div { min-width: 0; }
+.room-list-item strong { display: block; font-size: 12px; }
+.room-list-item small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.45; }
+.room-enter-btn {
+  flex: 0 0 auto; border: 1px solid var(--accent); color: var(--accent);
+  background: transparent; border-radius: 6px; padding: 6px 10px; font-size: 10px; cursor: pointer;
+}
+.room-enter-btn:disabled { opacity: .45; cursor: not-allowed; }
+.recent-empty { color: var(--muted); font-size: 11px; }
+
+@media (max-width: 620px) {
+  .google-login-panel { padding: 13px; }
+  #googleSignInButton > div { max-width: 100%; }
+  .room-list-item { align-items: flex-start; }
+  .room-enter-btn { padding: 6px 8px; }
+}
