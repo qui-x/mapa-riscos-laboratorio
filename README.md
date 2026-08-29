@@ -1,6 +1,6 @@
 # Mapa de Riscos do Laboratório — Google Apps Script + Sheets + WebRTC
 
-Esta versão substitui o backend Node.js de salas por **Google Apps Script (GAS) + Google Sheets** e usa **WebRTC DataChannel** para sincronização direta entre o professor e os estudantes. A sinalização WebRTC é feita por polling em uma planilha, conforme o plano de migração.
+A versão atual usa **autenticação local demonstrativa** e gerenciamento local de salas. Os arquivos de Google Apps Script permanecem no pacote apenas como referência/infraestrutura opcional para uma futura autenticação e sincronização remotas.
 
 ## Estrutura
 
@@ -99,7 +99,7 @@ No Google Apps Script, execute `setupMasterSpreadsheet()` uma vez. A função cr
 Os valores reais de `GAS_URL` e `GOOGLE_CLIENT_ID` continuam a ser configurados pelo responsável pela publicação em `js/config.js`, pois dependem do projeto Google/GAS do ambiente.
 
 
-## Configuração do Google Login
+## Configuração Google legada
 
 Antes de publicar no GitHub Pages, edite `js/config.js` e informe os valores reais:
 
@@ -114,8 +114,9 @@ O `GOOGLE_CLIENT_ID` deve ser uma credencial OAuth 2.0 do tipo **Web application
 
 Não publique valores fictícios como `COLE_AQUI...`: isso provoca `401 invalid_client`.
 
-## Configuração do frontend
+## Autenticação local
 
-Os valores reais de `GAS_URL` e `GOOGLE_CLIENT_ID` já estão preenchidos em `js/config.js` nesta versão. Para publicar em outro ambiente, substitua-os pelos valores correspondentes.
+Esta versão usa contas locais em `localStorage`, sem Google Identity Services. O cadastro armazena a senha como hash SHA-256 para o modo demonstrativo e a sessão atual fica em `mapa_riscos_local_current_user_v1`.
 
-O `GOOGLE_CLIENT_ID` deve ser um cliente OAuth 2.0 do tipo Web e a origem do GitHub Pages deve estar autorizada no Google Cloud Console.
+Professores podem criar salas locais de 6 caracteres e estudantes podem entrar nelas no mesmo navegador/dispositivo. Para salas compartilhadas entre dispositivos, é necessário conectar novamente um backend de salas.
+

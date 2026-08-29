@@ -16,7 +16,7 @@ assert.ok(dataTypes.length > 0, 'Nenhum botão de elemento encontrado');
 for (const type of knownHtmlTypes) assert.ok(typeKeys.includes(type), `Tipo ${type} não existe em TYPES`);
 assert.match(js, /querySelectorAll\("\.palette button\[data-type\]"\)/, 'Bindings da paleta não usam o seletor de todos os grupos');
 assert.match(html, /id="palette"/, 'Âncora #palette ausente para o stepper');
-assert.match(js, /\$\("ruler"\)\.onclick/, 'Botão Cotas sem listener');
+assert.match(js, /on\(\"ruler\",\s*\"click\"/, "Botão Cotas sem listener");
 assert.match(js, /state\.ruler\s*=\s*!state\.ruler/, 'Botão Cotas não alterna state.ruler');
 assert.match(js, /if \(!state\.drag && !state\.ruler\) return;/, 'Tooltip de dimensões não respeita estado de Cotas');
 assert.equal((html.match(/id="totalObjectsBadge"/g) || []).length, 1, 'totalObjectsBadge deve existir uma única vez');

@@ -2152,48 +2152,17 @@ body.role-student .topbar-end-room{display:none!important}
 /* .has-room-session .room-code-badge strong: regras visuais e de comportamento deste componente. */
 .has-room-session .room-code-badge strong{font-size:10px}}
 
-/* FRENTE 34 — autenticação Google e salas do usuário. */
-.google-login-panel {
-  margin: 18px 0;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: rgba(255,255,255,.025);
-  text-align: center;
-}
-.google-login-panel h2 { margin: 0 0 5px; font-size: 15px; }
-.google-login-panel p { margin: 0 0 12px; color: var(--muted); font-size: 11px; line-height: 1.5; }
-#googleSignInButton { min-height: 44px; display: flex; justify-content: center; align-items: center; }
-.google-user-status, .google-config-warning { margin-top: 10px; color: var(--muted); font-size: 11px; }
-.google-config-warning { color: #fbbf24; }
-.topbar-text-btn {
-  border: 1px solid var(--line);
-  background: var(--panel2);
-  color: var(--text);
-  border-radius: 7px;
-  padding: 7px 10px;
-  font-size: 11px;
-  cursor: pointer;
-}
-.room-list-item {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px;
-  background: var(--panel2);
-}
-.room-list-item + .room-list-item { margin-top: 7px; }
-.room-list-item > div { min-width: 0; }
-.room-list-item strong { display: block; font-size: 12px; }
-.room-list-item small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.45; }
-.room-enter-btn {
-  flex: 0 0 auto; border: 1px solid var(--accent); color: var(--accent);
-  background: transparent; border-radius: 6px; padding: 6px 10px; font-size: 10px; cursor: pointer;
-}
-.room-enter-btn:disabled { opacity: .45; cursor: not-allowed; }
-.recent-empty { color: var(--muted); font-size: 11px; }
+/* Autenticação local e gerenciamento de salas demonstrativo. */
 
-@media (max-width: 620px) {
-  .google-login-panel { padding: 13px; }
-  #googleSignInButton > div { max-width: 100%; }
-  .room-list-item { align-items: flex-start; }
-  .room-enter-btn { padding: 6px 8px; }
-}
+
+/* Controles adicionais do formulário local de autenticação. */
+.auth-form { gap: 8px; }
+.auth-form input { text-transform: none; letter-spacing: normal; font-family: inherit; }
+.login-secondary-action { width: 100%; min-height: 38px; margin-top: 8px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; }
+.login-secondary-action:hover { border-color: var(--accent); color: var(--text); }
+.auth-room-panel { margin-top: 12px; }
+body.role-student .auth-room-panel#loginProfessorPanel { display: none; }
+
+/* Ações agrupadas da seção de salas na Home. */
+.home-recent-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+@media (max-width:620px) { .home-recent-actions { width:100%; justify-content:stretch; } .home-recent-actions .home-continue { flex:1; } }

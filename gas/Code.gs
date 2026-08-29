@@ -2,7 +2,7 @@
  * Mapa de Riscos do Laboratório — Backend Google Apps Script.
  *
  * Responsabilidades:
- * - autenticar usuários com Google Identity Services (GIS);
+ * - autenticar usuários com email e senha;
  * - manter usuários, salas, projetos e sinalização no Google Sheets;
  * - gerar sessões temporárias com CacheService;
  * - opcionalmente persistir projetos cifrados no Google Drive;
@@ -10,12 +10,10 @@
  *
  * Antes de publicar:
  * 1. configure SPREADSHEET_ID;
- * 2. configure GOOGLE_CLIENT_ID;
  * 3. publique o projeto como Web App.
  */
 
 const SPREADSHEET_ID = 'SEU_ID_DA_PLANILHA';
-const GOOGLE_CLIENT_ID = 'SEU_CLIENT_ID_GOOGLE';
 const SHEET_USUARIOS = 'usuarios';
 const SHEET_SALAS = 'salas';
 const SHEET_SINALIZACAO = 'sinalizacao';
@@ -23,7 +21,7 @@ const SHEET_PROJETOS = 'projetos';
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const SESSION_TTL_SECONDS = 3600;
 
-const USUARIOS_HEADERS = ['id', 'email', 'nome', 'foto', 'papel', 'criadoEm', 'ultimoAcesso'];
+const USUARIOS_HEADERS = ['id', 'email', 'nome', 'foto', 'papel', 'senhaHash', 'senhaSalt', 'criadoEm', 'ultimoAcesso'];
 const SALAS_HEADERS = ['codigo', 'status', 'criadorId', 'criadaEm', 'projeto', 'projetoDriveId', 'participantes'];
 const SIGNAL_HEADERS = ['codigoSala', 'remetente', 'destinatario', 'tipo', 'payload', 'timestamp'];
 const PROJECT_HEADERS = ['codigoSala', 'versao', 'salvoEm', 'projeto'];
@@ -213,58 +211,137 @@ function findUserById(userId) {
   for (let i = 0; i < rows.length; i++) if (String(rows[i][0]) === String(userId)) return { sheet, index: i + 2, row: rows[i] };
   return null;
 }
-/** Valida um token ID do Google consultando o endpoint oficial de tokeninfo. */
-function verifyIdToken(idToken) {
-  if (!idToken) throw new Error('Token Google não fornecido.');
-  const url = 'https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(idToken);
-  const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-  if (response.getResponseCode() !== 200) throw new Error('Token Google inválido.');
-  const payload = JSON.parse(response.getContentText());
-  if (payload.iss !== 'accounts.google.com' && payload.iss !== 'https://accounts.google.com') throw new Error('Emissor Google inválido.');
-  if (GOOGLE_CLIENT_ID !== 'SEU_CLIENT_ID_GOOGLE' && payload.aud !== GOOGLE_CLIENT_ID) throw new Error('Cliente Google não autorizado.');
-  if (payload.exp && Number(payload.exp) * 1000 <= Date.now()) throw new Error('Token Google expirado.');
-  if (String(payload.email_verified || '').toLowerCase() !== 'true') throw new Error('Conta Google não verificada.');
-  return payload;
+/** Normaliza um endereço de e-mail para comparação consistente. */
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase();
 }
-/** Cria ou atualiza o usuário autenticado e devolve seu perfil. */
-function upsertUserFromGoogle(payload) {
+/** Valida o formato mínimo de um endereço de e-mail. */
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || ''));
+}
+/** Converte bytes em hexadecimal para uso em hashes e salts. */
+function bytesToHex_(bytes) {
+  return bytes.map(function(b) {
+    const n = b < 0 ? b + 256 : b;
+    return ('0' + n.toString(16)).slice(-2);
+  }).join('');
+}
+/** Gera um salt aleatório para armazenamento da senha. */
+function generatePasswordSalt() {
+  return bytesToHex_(Utilities.getUuid().split('').map(function(ch, i) {
+    return ch.charCodeAt(0) ^ ((i * 31) & 255);
+  }).slice(0, 16));
+}
+/** Calcula SHA-256 de uma senha combinada com seu salt. */
+function hashPassword(password, salt) {
+  const raw = String(salt || '') + ':' + String(password || '');
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, raw, Utilities.Charset.UTF_8);
+  return bytesToHex_(digest);
+}
+/** Valida as regras mínimas de senha. */
+function validatePassword(password) {
+  const value = String(password || '');
+  if (value.length < 6) throw new Error('A senha deve ter pelo menos 6 caracteres.');
+  return true;
+}
+/** Procura um usuário pelo e-mail. */
+function findUserByEmail(email) {
+  const normalized = normalizeEmail(email);
   const sheet = getSheet(SHEET_USUARIOS, USUARIOS_HEADERS);
-  const found = findUserById(payload.sub);
-  const now = new Date().toISOString();
-  const papelAtual = found ? String(found.row[4] || 'estudante') : 'estudante';
-  if (!found) {
-    sheet.appendRow([payload.sub, payload.email || '', payload.name || payload.email || 'Usuário', payload.picture || '', 'estudante', now, now]);
-    return { id: payload.sub, email: payload.email || '', nome: payload.name || payload.email || 'Usuário', foto: payload.picture || '', papel: 'estudante' };
+  const map = headerMap(sheet);
+  const rows = readRows(sheet);
+  const emailIndex = map.email ?? 1;
+  for (let i = 0; i < rows.length; i++) {
+    if (normalizeEmail(rows[i][emailIndex]) === normalized) {
+      return { sheet: sheet, index: i + 2, row: rows[i], map: map };
+    }
   }
-  found.sheet.getRange(found.index, 2, 1, 3).setValues([[payload.email || found.row[1] || '', payload.name || found.row[2] || payload.email || 'Usuário', payload.picture || found.row[3] || '']]);
-  found.sheet.getRange(found.index, 7).setValue(now);
-  return { id: payload.sub, email: payload.email || found.row[1] || '', nome: payload.name || found.row[2] || 'Usuário', foto: payload.picture || found.row[3] || '', papel: papelAtual };
+  return null;
 }
+/** Converte uma linha da aba usuarios em um objeto seguro para o frontend. */
+function userFromRow(found) {
+  const row = found.row;
+  const map = found.map || {};
+  return {
+    id: String(row[map.id ?? 0] || ''),
+    email: String(row[map.email ?? 1] || ''),
+    nome: String(row[map.nome ?? 2] || ''),
+    foto: String(row[map.foto ?? 3] || ''),
+    papel: String(row[map.papel ?? 4] || 'estudante')
+  };
+}
+/** Registra um novo usuário com senha armazenada apenas como hash + salt. */
+function authRegister(data) {
+  const nome = String(data.nome || '').trim();
+  const email = normalizeEmail(data.email);
+  const senha = String(data.senha || '');
+  const papel = String(data.papel || '').toLowerCase();
+
+  if (nome.length < 2) return fail('Informe um nome válido.', 'INVALID_NAME');
+  if (!isValidEmail(email)) return fail('Informe um e-mail válido.', 'INVALID_EMAIL');
+  validatePassword(senha);
+  if (['professor', 'estudante'].indexOf(papel) < 0) return fail('Perfil inválido.', 'INVALID_ROLE');
+  if (findUserByEmail(email)) return fail('Este e-mail já está cadastrado.', 'EMAIL_EXISTS');
+
+  const sheet = getSheet(SHEET_USUARIOS, USUARIOS_HEADERS);
+  const now = new Date().toISOString();
+  const userId = Utilities.getUuid();
+  const salt = generatePasswordSalt();
+  const senhaHash = hashPassword(senha, salt);
+  sheet.appendRow([userId, email, nome, '', papel, senhaHash, salt, now, now]);
+
+  const usuario = { id: userId, email: email, nome: nome, foto: '', papel: papel };
+  const sessionToken = createSession(usuario);
+  return ok({ usuario: usuario, sessionToken: sessionToken });
+}
+/** Autentica um usuário por e-mail e senha. */
+function authLogin(data) {
+  const email = normalizeEmail(data.email);
+  const senha = String(data.senha || '');
+  const requestedRole = String(data.papel || '').toLowerCase();
+
+  if (!isValidEmail(email)) return fail('E-mail ou senha inválidos.', 'INVALID_CREDENTIALS');
+  if (!senha) return fail('E-mail ou senha inválidos.', 'INVALID_CREDENTIALS');
+
+  const found = findUserByEmail(email);
+  if (!found) return fail('E-mail ou senha inválidos.', 'INVALID_CREDENTIALS');
+
+  const map = found.map;
+  const salt = String(found.row[map.senhaSalt ?? 6] || '');
+  const storedHash = String(found.row[map.senhaHash ?? 5] || '');
+  const computedHash = hashPassword(senha, salt);
+  if (!storedHash || computedHash !== storedHash) return fail('E-mail ou senha inválidos.', 'INVALID_CREDENTIALS');
+
+  const usuario = userFromRow(found);
+  if (requestedRole && usuario.papel !== requestedRole) return fail('O perfil selecionado não corresponde à sua conta.', 'ROLE_MISMATCH');
+
+  found.sheet.getRange(found.index, (map.ultimoAcesso ?? 8) + 1).setValue(new Date().toISOString());
+  const sessionToken = createSession(usuario);
+  return ok({ usuario: usuario, sessionToken: sessionToken });
+}
+
 /** Cria uma sessão temporária vinculada ao usuário autenticado. */
 function createSession(usuario) {
   const sessionToken = generateToken();
   CacheService.getScriptCache().put('session_' + sessionToken, JSON.stringify(usuario), SESSION_TTL_SECONDS);
   return sessionToken;
 }
-/** Autentica uma sessão e retorna o usuário correspondente. */
+/** Valida uma sessão temporária e retorna o usuário associado. */
 function ensureAuthenticated(sessionToken) {
   if (!sessionToken) throw new Error('Não autenticado.');
   const cached = CacheService.getScriptCache().get('session_' + String(sessionToken));
   if (!cached) throw new Error('Sessão expirada. Faça login novamente.');
   return JSON.parse(cached);
 }
-/** Invalida uma sessão temporária. */
+/** Encerra uma sessão temporária. */
 function authLogout(data) {
-  if (data && data.sessionToken) CacheService.getScriptCache().remove('session_' + String(data.sessionToken));
+  if (data && data.sessionToken) {
+    CacheService.getScriptCache().remove('session_' + String(data.sessionToken));
+  }
   return ok({ message: 'Sessão encerrada.' });
 }
-/** Realiza login via Google Identity Services. */
-function authLogin(data) {
-  const payload = verifyIdToken(data.idToken);
-  const usuario = upsertUserFromGoogle(payload);
-  const sessionToken = createSession(usuario);
-  return ok({ usuario: usuario, sessionToken: sessionToken });
-}
+
+
 /** Lista salas criadas ou frequentadas pelo usuário autenticado. */
 function listUserRooms(data) {
   const user = ensureAuthenticated(data.sessionToken);
@@ -285,6 +362,7 @@ function doPost(e) {
   try {
     const data = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     switch (data.action) {
+      case 'authRegister': return authRegister(data);
       case 'authLogin': return authLogin(data);
       case 'authLogout': return authLogout(data);
       case 'criar': return createRoom(data);

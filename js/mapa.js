@@ -10,7 +10,7 @@ const state = {
   cam: { x: 6, y: 4, zoom: 70 }, overviewCam: { x: 6, y: 4, zoom: 50 },
   grid: true, snap: true, ruler: false, tool: "select",
   selected: null, selectedObjects: [], marquee: null, drag: null, overviewDrag: null,
-  pan: false, last: null, history: [], future: [], pendingHistory: false, guides: [], panelTab: "layers", role: null, roomCode: null, roomToken: null, user: null, sessionToken: null
+  pan: false, last: null, history: [], future: [], pendingHistory: false, guides: [], panelTab: "layers", role: null, roomCode: null, roomToken: null, user: null
 };
 window.MAPA_RUNTIME = { get state() { return state; } };
 /**
@@ -151,109 +151,70 @@ function on(id, event, handler, options) {
   return el;
 }
 const ROOM_SESSION_KEY = "mapa_riscos_room_session";
-const USER_KEY = "mapa_riscos_user";
-const SESSION_TOKEN_KEY = "sessionToken";
+const USER_KEY = "mapa_riscos_local_current_user_v1";
 const canEdit = () => state.role !== "student";
-/** Retorna se existe uma sessão Google/GAS autenticada. */
-function isAuthenticated() { return Boolean(state.user && state.sessionToken); }
-/** Atualiza o estado visual dos controles que dependem do login. */
+
+/** Retorna se existe uma sessão local autenticada. */
+function isAuthenticated() { return Boolean(state.user?.id); }
+/** Atualiza a interface conforme o usuário autenticado e o modo da sala. */
 function applyAuthUI() {
   const authenticated = isAuthenticated();
-  const status = $("googleUserStatus");
   const homeIdentity = $("homeUserIdentity");
   const identityText = authenticated ? `${state.user.nome || state.user.email} · ${state.user.papel}` : "Não autenticado";
-  if (status) status.textContent = identityText;
   if (homeIdentity) homeIdentity.textContent = identityText;
-  document.querySelectorAll("#createRoomBtn, #professorJoinForm input, #professorJoinForm button, #studentJoinForm input, #studentJoinForm button").forEach(el => { el.disabled = !authenticated; });
-  if (!authenticated) { $("loginRoleProfessor")?.removeAttribute("disabled"); $("loginRoleStudent")?.removeAttribute("disabled"); }
+  document.querySelectorAll("#createRoomBtn, #professorJoinForm input, #professorJoinForm button, #studentJoinForm input, #studentJoinForm button").forEach(el => { el.disabled = !authenticated || state.role === "student"; });
+  const createBtn = $("createRoomBtn"); if (createBtn) createBtn.disabled = !authenticated || state.user.papel !== "professor";
 }
-/** Inicializa o Google Identity Services com o client ID configurado. */
-function isValidGoogleClientId(clientId) {
-  return /^[0-9]+-[a-z0-9-]+\.apps\.googleusercontent\.com$/i.test(String(clientId || "").trim());
+
+/** Mantém a UI de login/cadastro coerente com o perfil selecionado. */
+function syncAuthFormUI() {
+  const professor = loginUiRole === "professor";
+  const registering = loginUiMode === "register";
+  $("authTitle")?.replaceChildren(document.createTextNode(`${registering ? "Criar conta" : "Entrar"} como ${professor ? "professor" : "estudante"}`));
+  const subtitle = $("authSubtitle"); if (subtitle) subtitle.textContent = professor ? "Acesse sua conta para criar e gerenciar salas." : "Acesse sua conta para participar de uma sala.";
+  $("registerNameField")?.classList.toggle("hidden", !registering);
+  $("studentRoomField")?.classList.toggle("hidden", professor || registering);
+  $("authSubmitHint")?.replaceChildren(document.createTextNode(registering ? "Salvar minha conta" : "Usar minha conta"));
+  const submit = $("authSubmit"); if (submit) submit.querySelector("strong").textContent = registering ? "Criar conta" : "Entrar";
 }
-function isConfiguredGasUrl(url) {
-  return /^https:\/\/script\.google\.com\/macros\/s\/[^\s/]+\/exec$/i.test(String(url || "").trim());
-}
-/** Inicializa o Google Identity Services somente quando a configuração local é válida. */
-function initializeGoogleIdentity() {
-  const clientId = String(window.APP_CONFIG?.GOOGLE_CLIENT_ID || "").trim();
-  const gasUrl = String(window.APP_CONFIG?.GAS_URL || "").trim();
-  const host = $("googleSignInButton");
-  if (!host) return;
-  if (!isValidGoogleClientId(clientId)) {
-    host.innerHTML = '<span class="google-config-warning">Configure um Google Client ID OAuth para Web válido em js/config.js.</span>';
-    console.error("GIS não inicializado: GOOGLE_CLIENT_ID ausente ou inválido.");
-    return;
-  }
-  if (!isConfiguredGasUrl(gasUrl)) {
-    host.innerHTML = '<span class="google-config-warning">Configure a URL /exec do Google Apps Script em js/config.js.</span>';
-    console.error("Login não pode continuar: GAS_URL ausente ou inválida.");
-    return;
-  }
-  let attempts = 0;
-  const ready = () => {
-    if (window.google?.accounts?.id) {
-      window.google.accounts.id.initialize({ client_id: clientId, callback: window.handleGoogleSignIn, auto_select: false });
-      host.innerHTML = "";
-      window.google.accounts.id.renderButton(host, { theme: "outline", size: "large", text: "signin_with", shape: "rectangular", width: 320 });
+
+let loginUiRole = "professor";
+let loginUiMode = "login";
+
+/** Processa o login ou cadastro local conforme o modo atual. */
+async function submitAuthForm(e) {
+  e.preventDefault(); setLoginError(""); setLoginLoading(true, loginUiMode === "register" ? "Criando conta…" : "Entrando…");
+  try {
+    const nome = $("authName")?.value || ""; const email = $("authEmail")?.value || ""; const senha = $("authPassword")?.value || "";
+    const user = loginUiMode === "register" ? await AuthAPI.registerUser(nome, email, senha, loginUiRole) : await AuthAPI.loginUser(email, senha, loginUiRole);
+    state.user = user; applyAuthUI();
+    console.log("Usuário autenticado:", state.user);
+    if (loginUiRole === "estudante" && $("studentRoomCodeAuth")?.value) {
+      await joinRoomFromLogin($("studentRoomCodeAuth").value, false);
       return;
     }
-    attempts += 1;
-    if (attempts < 20) { setTimeout(ready, 500); return; }
-    host.textContent = "Login Google indisponível";
-  };
-  ready();
-}
-/** Recebe o ID token do Google, autentica no GAS e abre a Home. */
-async function handleGoogleSignIn(response) {
-  const idToken = response?.credential;
-  if (!idToken) { setLoginError("O Google não retornou um token válido."); return; }
-  setLoginError(""); setLoginLoading(true, "Validando conta Google…");
-  try {
-    const result = await apiRequest("/api/auth/login", { method: "POST", body: JSON.stringify({ idToken }) });
-    state.user = result.usuario; state.sessionToken = result.sessionToken;
-    console.log("Usuário autenticado:", state.user);
-    console.log("Sessão criada:", Boolean(state.sessionToken));
-    localStorage.setItem(USER_KEY, JSON.stringify(state.user));
-    localStorage.setItem(SESSION_TOKEN_KEY, state.sessionToken);
-    applyAuthUI(); await loadUserRooms(); showHomeScreen();
-    showToast(`Login realizado como ${state.user.nome || state.user.email}`, "success");
-  } catch (err) { setLoginError(err.message || "Falha no login Google."); }
+    showHomeScreen(); showToast(`Acesso realizado como ${user.nome}`, "success");
+  } catch (err) { setLoginError(err.message || "Não foi possível autenticar."); }
   finally { setLoginLoading(false); }
 }
-window.handleGoogleSignIn = handleGoogleSignIn;
-/** Carrega as salas nas quais o usuário atual é criador ou participante. */
+
+/** Carrega as salas locais vinculadas ao usuário autenticado. */
 async function loadUserRooms() {
   if (!isAuthenticated()) return [];
   const result = await apiRequest("/api/usuario/salas", { method: "POST", body: JSON.stringify({}) });
-  const rooms = Array.isArray(result.salas) ? result.salas : [];
-  const section = $("userRoomsSection"), list = $("userRoomsList");
+  const rooms = Array.isArray(result.salas) ? result.salas : []; const section = $("userRoomsSection"), list = $("userRoomsList");
   if (!section || !list) return rooms;
   section.hidden = false;
-  if (!rooms.length) { list.innerHTML = '<span class="recent-empty">Nenhuma sala vinculada à conta.</span>'; return rooms; }
-  list.innerHTML = rooms.map(room => {
-    const code = escapeHtml(room.codigo);
-    return `<div class="room-list-item"><div><strong>Sala ${code}</strong><small>${room.papel === "professor" ? "Professor" : "Estudante"} · ${room.status === "ativa" ? "Ativa" : "Encerrada"} · ${room.participantes || 0} participante(s)</small></div><button type="button" class="room-enter-btn" data-room-code="${code}" ${room.status === "ativa" ? "" : "disabled"}>Entrar</button></div>`;
-  }).join("");
+  list.innerHTML = rooms.length ? rooms.map(room => { const code = escapeHtml(room.codigo); return `<div class="room-list-item"><div><strong>Sala ${code}</strong><small>${room.papel === "professor" ? "Professor" : "Estudante"} · ${room.status === "ativa" ? "Ativa" : "Encerrada"} · ${room.participantes || 0} participante(s)</small></div><button type="button" class="room-enter-btn" data-room-code="${code}" ${room.status === "ativa" ? "" : "disabled"}>Entrar</button></div>`; }).join("") : '<span class="recent-empty">Nenhuma sala vinculada a esta conta.</span>';
   list.querySelectorAll(".room-enter-btn").forEach(btn => btn.addEventListener("click", () => enterListedRoom(btn.dataset.roomCode)));
   return rooms;
 }
+
 /** Entra em uma sala escolhida na Home. */
-async function enterListedRoom(code) {
-  if (!isAuthenticated()) return showToast("Faça login com Google primeiro", "info");
-  setLoginLoading(true, "Entrando na sala…");
-  try { const data = await apiRequest("/api/sala/entrar", { method: "POST", body: JSON.stringify({ codigo: code }) }); await enterRoomFromServer(data.sala, data.sala.papel); }
-  catch (err) { showToast(err.message, "error"); }
-  finally { setLoginLoading(false); }
-}
-/** Encerra a sessão Google/GAS e retorna para o login. */
-async function logoutUser() {
-  const token = state.sessionToken || localStorage.getItem(SESSION_TOKEN_KEY);
-  try { if (token) await apiRequest("/api/auth/logout", { method: "POST", body: JSON.stringify({ sessionToken: token }) }); } catch (_) {}
-  window.RoomBackend?.stopRealtime?.(); state.user = null; state.sessionToken = null; state.role = null; state.roomCode = null; state.roomToken = null;
-  localStorage.removeItem(USER_KEY); localStorage.removeItem(SESSION_TOKEN_KEY); sessionStorage.removeItem(ROOM_SESSION_KEY);
-  applySessionUI(); applyAuthUI(); window.google?.accounts?.id?.disableAutoSelect?.(); showLoginScreen();
-}
+async function enterListedRoom(code) { if (!isAuthenticated()) return; setLoginLoading(true, "Entrando na sala…"); try { const data = await apiRequest("/api/sala/entrar", { method: "POST", body: JSON.stringify({codigo:code}) }); await enterRoomFromServer(data.sala, data.sala.papel); } catch (err) { showToast(err.message, "error"); } finally { setLoginLoading(false); } }
+
+/** Encerra a sessão local. */
+async function logoutUser() { state.user = null; clearRoomSession(); AuthAPI.logoutUser(); applySessionUI(); applyAuthUI(); showLoginScreen(); }
 
 /**
  * Mostra ou oculta o estado de carregamento da tela de login.
@@ -281,18 +242,14 @@ function setLoginRole(role) {
   $("loginProfessorPanel")?.classList.toggle("hidden", !professor);
   $("loginStudentPanel")?.classList.toggle("hidden", professor);
   setLoginError("");
-  requestAnimationFrame(() => (professor ? $("professorRoomCode") : $("studentRoomCode"))?.focus());
+  requestAnimationFrame(() => (professor ? $("authEmail") : $("authEmail"))?.focus());
 }
 /**
  * Wrapper do cliente que encaminha requisições para o módulo de comunicação com o backend.
  */
 async function apiRequest(path, options = {}) {
-  if (window.RoomBackend?.request) return window.RoomBackend.request(path, options);
-  const response = await fetch(path, { headers: { "Content-Type": "application/json", ...(options.headers || {}) }, ...options });
-  let data = null;
-  try { data = await response.json(); } catch { data = { ok: false, error: "Resposta inválida do servidor." }; }
-  if (!response.ok || data?.ok === false) throw new Error(data?.error || `Erro HTTP ${response.status}`);
-  return data;
+  if (window.LocalRoomBackend?.request) return window.LocalRoomBackend.request(path, options);
+  throw new Error("Backend local indisponível.");
 }
 /**
  * Salva no armazenamento local os dados mínimos da sessão da sala.
@@ -334,11 +291,7 @@ let roomSocket = null;
  */
 async function syncRoomProject() {
   if (state.role !== "professor" || !state.roomCode || !state.roomToken) return;
-  try {
-    const projeto = sanitizeProjectForSync();
-    await apiRequest("/api/sala/salvar", { method:"POST", body:JSON.stringify({codigo:state.roomCode,token:state.roomToken,projeto}) });
-    await window.RoomBackend?.broadcastUpdate?.(projeto);
-  } catch (err) { console.warn("Não foi possível sincronizar a sala", err); }
+  try { await apiRequest("/api/sala/salvar", { method:"POST", body:JSON.stringify({codigo:state.roomCode, projeto:sanitizeProjectForSync()}) }); } catch (err) { console.warn("Não foi possível salvar a sala local", err); }
 }
 /**
  * Agenda uma nova sincronização evitando chamadas repetitivas a cada pequena alteração.
@@ -351,7 +304,7 @@ function scheduleRoomSync() {
  * Inicia o mecanismo de tempo real da sala quando a sessão está disponível.
  */
 function connectRoomSocket() {
-  if (window.RoomBackend?.startRealtime) window.RoomBackend.startRealtime();
+  // O modo de autenticação local não inicializa um canal remoto automaticamente.
 }
 
 /**
@@ -365,14 +318,9 @@ async function enterRoomFromServer(sala, role) {
   if (!state.roomCode) throw new Error("O servidor não retornou o código da sala.");
   if (!state.roomToken) throw new Error("Não foi possível identificar o usuário autenticado para a sala.");
   persistRoomSession(); applySessionUI();
-  if (window.RoomBackend?.stopRealtime) window.RoomBackend.stopRealtime();
   if (sala.projeto) {
-    const data = await (window.RoomBackend?.decryptRoomProject ? window.RoomBackend.decryptRoomProject(sala) : Promise.resolve(sala.projeto));
-    if (data?.areas) {
-      state.areas = normalizeModelAreas(data.areas);
-      state.areaAtiva = state.areas.find(a => a.id === data.areaAtiva)?.id || state.areas[0]?.id;
-      syncAreaConnections(); updateAreaUI();
-    }
+    const data = typeof sala.projeto === "string" ? (() => { try { return JSON.parse(sala.projeto); } catch { return null; } })() : sala.projeto;
+    if (data?.areas) { state.areas = normalizeModelAreas(data.areas); state.areaAtiva = state.areas.find(a => a.id === data.areaAtiva)?.id || state.areas[0]?.id; syncAreaConnections(); updateAreaUI(); }
   } else if (!state.areas.length) {
     const a = createArea(); state.areas=[a]; state.areaAtiva=a.id;
   }
@@ -384,30 +332,19 @@ async function enterRoomFromServer(sala, role) {
  * Cria uma nova sala a partir da tela de login e entra como professor.
  */
 async function createRoomFromLogin() {
-  if (!isAuthenticated()) { setLoginError("Faça login com Google antes de criar uma sala."); return; }
+  if (!isAuthenticated()) { setLoginError("Faça login antes de criar uma sala."); return; }
   if (state.user.papel !== "professor") { setLoginError("Sua conta não está cadastrada como professor."); return; }
   setLoginError(""); setLoginLoading(true, "Criando sala…");
-  try {
-    console.log("1. Tentando criar sala...", { user: state.user, sessionTokenPresent: Boolean(state.sessionToken) });
-    const data = await apiRequest("/api/sala/criar", { method:"POST", body:JSON.stringify({}) });
-    console.log("2. Sala criada:", data);
-    if (!data?.sala?.codigo) throw new Error("O servidor não retornou uma sala válida.");
-    await enterRoomFromServer(data.sala, "professor");
-    console.log("4. Entrou no editor como professor:", { role: state.role, roomCode: state.roomCode, user: state.user });
-    // Não retornar à Home após criar a sala: o fluxo correto é entrar diretamente no editor.
-    showToast(`Sala criada. Código: ${data.sala.codigo}`, "success");
-  } catch (err) {
-    console.error("ERRO na criação da sala:", err);
-    setLoginError(err?.message || "Não foi possível criar a sala.");
-  }
+  try { const data = await apiRequest("/api/sala/criar", { method:"POST", body:JSON.stringify({}) }); if (!data?.sala?.codigo) throw new Error("Não foi possível criar a sala."); await enterRoomFromServer(data.sala, "professor"); showToast(`Sala criada. Código: ${data.sala.codigo}`, "success"); }
+  catch (err) { console.error("ERRO na criação da sala:", err); setLoginError(err.message || "Não foi possível criar a sala."); }
   finally { setLoginLoading(false); }
 }
 /**
  * Valida o código informado e entra na sala com o papel solicitado.
  */
 async function joinRoomFromLogin(code, professorAttempt=false) {
-  if (!isAuthenticated()) { setLoginError("Faça login com Google antes de entrar na sala."); return; }
-  if (professorAttempt && state.user.papel !== "professor") { setLoginError("Sua conta não está cadastrada como professor."); return; }
+  if (!isAuthenticated()) { setLoginError("Faça login antes de entrar na sala."); return; }
+  if (professorAttempt && state.user.papel !== "professor") { setLoginError("Apenas a conta de professor pode retomar uma sala como proprietária."); return; }
   const normalized = String(code || "").trim().toUpperCase();
   if (!/^[A-Z0-9]{6}$/.test(normalized)) { setLoginError("Digite um código de 6 caracteres."); return; }
   setLoginError(""); setLoginLoading(true, "Verificando sala…");
@@ -423,7 +360,7 @@ async function joinRoomFromLogin(code, professorAttempt=false) {
  */
 function showLoginScreen() {
   $("loginScreen")?.classList.remove("hidden"); $("homeScreen")?.classList.add("hidden"); $("app")?.classList.add("hidden");
-  setLoginRole("professor"); setLoginLoading(false); setLoginError(""); applyAuthUI();
+  loginUiRole = "professor"; loginUiMode = "login"; setLoginRole("professor"); syncAuthFormUI(); setLoginLoading(false); setLoginError(""); applyAuthUI();
 }
 /**
  * Tenta restaurar uma sessão de sala existente na inicialização do aplicativo.
@@ -3167,14 +3104,12 @@ window.addEventListener("keydown", e => {
   }
 });
 
-/** Restaura a sessão Google salva no navegador e valida sua validade no GAS. */
-async function bootstrapUserSession() {
-  let user = null; try { user = JSON.parse(localStorage.getItem(USER_KEY) || "null"); } catch {}
-  const token = localStorage.getItem(SESSION_TOKEN_KEY) || "";
-  if (!user || !token) return false;
-  state.user = user; state.sessionToken = token; applyAuthUI();
-  try { await loadUserRooms(); return true; }
-  catch { state.user = null; state.sessionToken = null; localStorage.removeItem(USER_KEY); localStorage.removeItem(SESSION_TOKEN_KEY); applyAuthUI(); return false; }
+/** Restaura a sessão local salva no navegador. */
+async function bootstrapLocalSession() {
+  const user = AuthAPI.getCurrentUser();
+  if (!user) return false;
+  state.user = user; applyAuthUI();
+  return true;
 }
 
 // RESTAURAÇÃO DE AUTOSAVE NO CARREGAMENTO
@@ -3198,13 +3133,13 @@ $("homeOpenProject")?.addEventListener("click", () => openProjectFileFromHome())
 $("homeUseModel")?.addEventListener("click", () => { if (state.user?.papel !== "professor") return showToast("Ação disponível apenas para o professor", "info"); openModelPickerFromHome(); });
 $("homeImportModel")?.addEventListener("click", () => { if (state.user?.papel !== "professor") return showToast("Ação disponível apenas para o professor", "info"); importModelFromHome(); });
 $("homeContinue")?.addEventListener("click", () => loadAutosaveIntoState());
+$("homeCreateRoomBtn")?.addEventListener("click", createRoomFromLogin);
 
 window.addEventListener("resize", resizeCanvas);
 window.addEventListener("DOMContentLoaded", async () => {
   state.areas.forEach(a => a.objetos.forEach(normalizeObject));
   syncAreaConnections(); updateAreaUI(); updateHomeRecent(); applySessionUI(); applyAuthUI();
-  initializeGoogleIdentity();
-  const authenticated = await bootstrapUserSession();
+  const authenticated = await bootstrapLocalSession();
   if (authenticated) {
     const restored = await bootstrapRoomSession();
     if (!restored) showHomeScreen();
@@ -3214,10 +3149,11 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 
 // LOGIN E SESSÕES DE SALA
-$("loginRoleProfessor")?.addEventListener("click", () => setLoginRole("professor"));
-$("loginRoleStudent")?.addEventListener("click", () => setLoginRole("student"));
+$("loginRoleProfessor")?.addEventListener("click", () => { loginUiRole = "professor"; loginUiMode = "login"; setLoginRole("professor"); syncAuthFormUI(); });
+$("loginRoleStudent")?.addEventListener("click", () => { loginUiRole = "estudante"; loginUiMode = "login"; setLoginRole("student"); syncAuthFormUI(); });
+$("authForm")?.addEventListener("submit", submitAuthForm);
+$("toggleRegister")?.addEventListener("click", () => { loginUiMode = loginUiMode === "register" ? "login" : "register"; syncAuthFormUI(); setLoginError(""); });
 $("createRoomBtn")?.addEventListener("click", createRoomFromLogin);
-$("logoutBtn")?.addEventListener("click", logoutUser);
 $("homeLogoutBtn")?.addEventListener("click", logoutUser);
 $("refreshUserRooms")?.addEventListener("click", () => loadUserRooms().catch(err => showToast(err.message, "error")));
 $("professorJoinForm")?.addEventListener("submit", e => { e.preventDefault(); joinRoomFromLogin($("professorRoomCode")?.value, true); });
@@ -3227,7 +3163,7 @@ $("roomCodeBadge")?.addEventListener("click", async () => { if (!state.roomCode)
 $("endRoomBtn")?.addEventListener("click", () => {
   if (state.role !== "professor" || !state.roomCode) return;
   showConfirmModal(`Encerrar a sala "${state.roomCode}"? Novos acessos serão bloqueados.`, async () => {
-    try { await apiRequest("/api/sala/encerrar", { method:"POST", body:JSON.stringify({codigo:state.roomCode,token:state.roomToken}) }); clearRoomSession(); showLoginScreen(); showToast("Sala encerrada", "success"); }
+    try { await apiRequest("/api/sala/encerrar", { method:"POST", body:JSON.stringify({codigo:state.roomCode}) }); clearRoomSession(); showLoginScreen(); showToast("Sala encerrada", "success"); }
     catch (err) { showToast(err.message, "error"); }
   }, {title:"Encerrar sala",confirmLabel:"Encerrar",cancelLabel:"Cancelar"});
 });

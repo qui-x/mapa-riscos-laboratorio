@@ -35,3 +35,13 @@ O frontend envia o ID token do Google somente para `authLogin`. O GAS valida o e
 ## Função de inicialização da planilha mestra
 
 A função `setupMasterSpreadsheet()` é o ponto de entrada recomendado para o primeiro setup. Ela: cria ou localiza a planilha mestra; cria `usuarios`, `salas`, `sinalizacao` e `projetos`; aplica cabeçalhos, congelamento e formatação básica; e salva o ID em `Script Properties`.
+
+## Autenticação por email e senha
+
+A autenticação atual do backend não usa Google Identity Services. O `Code.gs` possui os endpoints `authRegister`, `authLogin` e `authLogout` e armazena somente `senhaHash` e `senhaSalt` na aba `usuarios`.
+
+O cadastro pode ser executado com `action: "authRegister"` e o login com `action: "authLogin"`. O backend cria um `sessionToken` temporário no `CacheService`, que deve ser enviado nas operações protegidas.
+
+Perfis aceitos: `professor` e `estudante`. A autorização de criação, salvamento e encerramento de salas continua restrita ao professor.
+
+Para criar a planilha mestra pela primeira vez, execute `setupMasterSpreadsheet()` no editor do Apps Script. O ID é gravado em `Script Properties`.
