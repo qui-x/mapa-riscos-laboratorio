@@ -139,6 +139,17 @@ EQUIPMENT_TYPES.forEach(type => {
 });
 
 const $ = id => document.getElementById(id);
+
+/**
+ * Registra um listener somente quando o elemento existe no DOM.
+ * Evita falhas de inicialização quando partes opcionais da interface
+ * não estão presentes em uma tela específica.
+ */
+function on(id, event, handler, options) {
+  const el = $(id);
+  if (el) el.addEventListener(event, handler, options);
+  return el;
+}
 const ROOM_SESSION_KEY = "mapa_riscos_room_session";
 const USER_KEY = "mapa_riscos_user";
 const SESSION_TOKEN_KEY = "sessionToken";
@@ -2101,10 +2112,10 @@ function updateTree() {
     `;
 
     const actionBtns = groupHeader.querySelectorAll(".tree-action-btn");
-    actionBtns[0].onclick = (e) => { e.stopPropagation(); toggleGroupHidden(groupObjs); };
-    actionBtns[1].onclick = (e) => { e.stopPropagation(); toggleGroupLocked(groupObjs); };
+    actionBtns[0]?.addEventListener("click", (e) => { e.stopPropagation(); toggleGroupHidden(groupObjs); });
+    actionBtns[1]?.addEventListener("click", (e) => { e.stopPropagation(); toggleGroupLocked(groupObjs); });
 
-    groupHeader.onclick = (e) => {
+    groupHeader.addEventListener("click", (e) => {
       e.stopPropagation();
       if (e.ctrlKey || e.metaKey) {
         groupObjs.forEach(o => {
@@ -2115,9 +2126,9 @@ function updateTree() {
       }
       state.selected = state.selectedObjects[state.selectedObjects.length - 1];
       updateUI(); requestDraw();
-    };
+    });
 
-    groupHeader.onkeydown = (e) => handleTreeKeyDown(e, null, true, groupObjs);
+    groupHeader.addEventListener("keydown", (e) => handleTreeKeyDown(e, null, true, groupObjs));
 
     groupEl.appendChild(groupHeader);
 
@@ -2179,16 +2190,16 @@ function renderTreeItem(o) {
   `;
 
   const btns = item.querySelectorAll(".tree-action-btn");
-  btns[0].onclick = (e) => { e.stopPropagation(); toggleObjectHidden(o); };
-  btns[1].onclick = (e) => { e.stopPropagation(); toggleObjectLocked(o); };
+  btns[0]?.addEventListener("click", (e) => { e.stopPropagation(); toggleObjectHidden(o); });
+  btns[1]?.addEventListener("click", (e) => { e.stopPropagation(); toggleObjectLocked(o); });
 
-  item.onclick = (e) => {
+  item.addEventListener("click", (e) => {
     e.stopPropagation();
     selectWithGroupSupport(o, e.ctrlKey || e.metaKey);
     updateUI(); requestDraw();
-  };
+  });
 
-  item.onkeydown = (e) => handleTreeKeyDown(e, o, false, null);
+  item.addEventListener("keydown", (e) => handleTreeKeyDown(e, o, false, null));
 
   return item;
 }
@@ -2364,59 +2375,79 @@ $("btnCloseComplianceReport")?.addEventListener("click", closeComplianceReport);
 $("complianceReportModal")?.addEventListener("click", e => { if(e.target.id==="complianceReportModal") closeComplianceReport(); });
 
 // BINDINGS DE EVENTOS
+
 document.querySelectorAll(".palette button[data-type]").forEach(b => b.addEventListener("click", () => {
   const type = b.dataset.type;
-  if (!type || !TYPES[type]) return;
+  if (!type || !TYPES[type] || !canEdit()) return;
   addObject(type, state.room.w / 2, state.room.h / 2);
-  canvas.focus();
+  canvas?.focus();
 }));
 
 // O botão Cotas alterna a exibição persistente das dimensões do objeto selecionado.
-$("ruler").onclick = () => {
+on("ruler", "click", () => {
   state.ruler = !state.ruler;
-  $("ruler").classList.toggle("active", state.ruler);
-  $("ruler").setAttribute("aria-pressed", String(state.ruler));
+  $("ruler")?.classList.toggle("active", state.ruler);
+  $("ruler")?.setAttribute("aria-pressed", String(state.ruler));
   requestDraw();
-};
+});
 
-$("selectMode").onclick = () => { state.tool = "select"; $("selectMode").classList.add("active"); $("panMode").classList.remove("active"); };
-$("panMode").onclick = () => { state.tool = "pan"; $("panMode").classList.add("active"); $("selectMode").classList.remove("active"); };
-$("grid").onclick = () => { state.grid = !state.grid; $("grid").classList.toggle("active", state.grid); requestDraw(); };
-$("snap").onclick = () => { state.snap = !state.snap; $("snap").classList.toggle("active", state.snap); showToast(`Snap ${state.snap ? 'ativado' : 'desativado'}`, "info"); };
-$("zoomIn").onclick = () => { state.cam.zoom = clamp(state.cam.zoom * 1.15, 15, 220); updateZoomText(); requestDraw(); };
-$("zoomOut").onclick = () => { state.cam.zoom = clamp(state.cam.zoom * 0.87, 15, 220); updateZoomText(); requestDraw(); };
-$("fitRoom").onclick = fitRoom;
-$("undo").onclick = undo;
-$("redo").onclick = redo;
-
-$("ctxGroup").onclick = groupObjects;
-$("ctxUngroup").onclick = ungroupObjects;
+on("selectMode", "click", () => {
+  state.tool = "select";
+  $("selectMode")?.classList.add("active");
+  $("panMode")?.classList.remove("active");
+});
+on("panMode", "click", () => {
+  state.tool = "pan";
+  $("panMode")?.classList.add("active");
+  $("selectMode")?.classList.remove("active");
+});
+on("grid", "click", () => {
+  state.grid = !state.grid;
+  $("grid")?.classList.toggle("active", state.grid);
+  requestDraw();
+});
+on("snap", "click", () => {
+  state.snap = !state.snap;
+  $("snap")?.classList.toggle("active", state.snap);
+  showToast(`Snap ${state.snap ? "ativado" : "desativado"}`, "info");
+});
+on("zoomIn", "click", () => {
+  state.cam.zoom = clamp(state.cam.zoom * 1.15, 15, 220);
+  updateZoomText();
+  requestDraw();
+});
+on("zoomOut", "click", () => {
+  state.cam.zoom = clamp(state.cam.zoom * 0.87, 15, 220);
+  updateZoomText();
+  requestDraw();
+});
+on("fitRoom", "click", fitRoom);
+on("undo", "click", undo);
+on("redo", "click", redo);
+on("ctxGroup", "click", groupObjects);
+on("ctxUngroup", "click", ungroupObjects);
 
 const ctxLockBtn = $("ctxLock");
-if (ctxLockBtn) {
-  ctxLockBtn.onclick = () => {
-    if (!state.selectedObjects.length) return;
-    pushHistory();
-    const targetState = !state.selectedObjects.every(o => o.locked);
-    state.selectedObjects.forEach(o => o.locked = targetState);
-    updateUI(); requestDraw();
-    showToast(targetState ? "Elementos bloqueados" : "Elementos desbloqueados", "info");
-  };
-}
+ctxLockBtn?.addEventListener("click", () => {
+  if (!state.selectedObjects.length || !canEdit()) return;
+  pushHistory();
+  const targetState = !state.selectedObjects.every(o => o.locked);
+  state.selectedObjects.forEach(o => { o.locked = targetState; });
+  updateUI(); requestDraw();
+  showToast(targetState ? "Elementos bloqueados" : "Elementos desbloqueados", "info");
+});
 
 const ctxHideBtn = $("ctxHide");
-if (ctxHideBtn) {
-  ctxHideBtn.onclick = () => {
-    if (!state.selectedObjects.length) return;
-    pushHistory();
-    const targetState = !state.selectedObjects.every(o => o.hidden);
-    state.selectedObjects.forEach(o => o.hidden = targetState);
-    updateUI(); requestDraw();
-    showToast(targetState ? "Elementos ocultados" : "Elementos visíveis", "info");
-  };
-}
+ctxHideBtn?.addEventListener("click", () => {
+  if (!state.selectedObjects.length || !canEdit()) return;
+  pushHistory();
+  const targetState = !state.selectedObjects.every(o => o.hidden);
+  state.selectedObjects.forEach(o => { o.hidden = targetState; });
+  updateUI(); requestDraw();
+  showToast(targetState ? "Elementos ocultados" : "Elementos visíveis", "info");
+});
 
-$("ctxDuplicate").onclick = () => {
+on("ctxDuplicate", "click", () => {
   if (!canEdit()) return showToast("Ação disponível apenas para o professor", "info");
   if (!state.selectedObjects.length) return;
   pushHistory();
@@ -2430,22 +2461,19 @@ $("ctxDuplicate").onclick = () => {
   state.selected = clones[clones.length - 1];
   updateUI(); requestDraw();
   showToast("Elementos duplicados", "success");
-};
+});
 
-$("ctxRotate").onclick = () => {
+on("ctxRotate", "click", () => {
   if (!canEdit()) return showToast("Ação disponível apenas para o professor", "info");
   if (!state.selectedObjects.length) return;
   const unblocked = state.selectedObjects.filter(o => !o.locked);
-  if (!unblocked.length) {
-    showToast("Elementos bloqueados não podem ser girados", "info");
-    return;
-  }
+  if (!unblocked.length) return showToast("Elementos bloqueados não podem ser girados", "info");
   pushHistory();
   unblocked.forEach(o => { o.rot = (o.rot + 90) % 360; });
   updateUI(); requestDraw();
-};
+});
 
-$("ctxDelete").onclick = () => {
+on("ctxDelete", "click", () => {
   if (!canEdit()) return showToast("Ação disponível apenas para o professor", "info");
   if (!state.selectedObjects.length) return;
   pushHistory();
@@ -2454,16 +2482,16 @@ $("ctxDelete").onclick = () => {
   state.selected = null;
   updateUI(); requestDraw();
   showToast("Elementos removidos", "info");
-};
+});
 
 // EDIÇÃO DIRETA DE PROPRIEDADES
-$("applyProps").onclick = () => {
+on("applyProps", "click", () => {
   if (!canEdit()) return showToast("Ação disponível apenas para o professor", "info");
   if (!state.selectedObjects.length) return;
   pushHistory();
-  const nx = num($("x").value), ny = num($("y").value);
-  const nw = num($("w").value), nh = num($("h").value);
-  const nrot = num($("rot").value);
+  const nx = num($("x")?.value), ny = num($("y")?.value);
+  const nw = num($("w")?.value), nh = num($("h")?.value);
+  const nrot = num($("rot")?.value);
   const epiValue = ($("epi")?.value || "").trim();
 
   state.selectedObjects.forEach(o => {
@@ -2477,39 +2505,43 @@ $("applyProps").onclick = () => {
     }
   });
 
-  if(state.selectedObjects.length===1&&state.selectedObjects[0].type==="door"){state.selectedObjects[0].connectionAreaId=$("doorConnection")?.value||null;syncAreaConnections();}
+  if (state.selectedObjects.length === 1 && state.selectedObjects[0].type === "door") {
+    state.selectedObjects[0].connectionAreaId = $("doorConnection")?.value || null;
+    syncAreaConnections();
+  }
   updateUI(); requestDraw();
   showToast("Propriedades atualizadas", "info");
-};
+});
 
-$("rotate").onclick = () => { $("ctxRotate").click(); };
+on("rotate", "click", () => $("ctxRotate")?.click());
 
-$("applyRoom").onclick = () => {
+on("applyRoom", "click", () => {
   if (!canEdit()) return showToast("Ação disponível apenas para o professor", "info");
-  const w = num($("roomW").value);
-  const h = num($("roomH").value);
+  const w = num($("roomW")?.value);
+  const h = num($("roomH")?.value);
   if (w >= 2 && h >= 2) {
     pushHistory();
     state.room.w = w;
     state.room.h = h;
-    $("roomFeedback").textContent = `Sala atual: ${w.toFixed(1).replace(".", ",")} × ${h.toFixed(1).replace(".", ",")} m`;
+    const feedback = $("roomFeedback");
+    if (feedback) feedback.textContent = `Sala atual: ${w.toFixed(1).replace(".", ",")} × ${h.toFixed(1).replace(".", ",")} m`;
     fitRoom();
     updateUI();
     showToast("Dimensões da sala atualizadas", "success");
   } else {
     showToast("Dimensões mínimas da sala: 2 x 2 metros", "error");
   }
-};
+});
 
-$("rot").oninput = (e) => {
+on("rot", "input", e => {
   const val = e.target.value;
-  $("rotVal").textContent = val + "°";
+  const rotVal = $("rotVal");
+  if (rotVal) rotVal.textContent = val + "°";
   if (state.selectedObjects.length) {
     state.selectedObjects.forEach(o => { if (!o.locked) o.rot = num(val); });
     requestDraw();
   }
-};
-
+});
 
 // TELA INICIAL (HUB)
 let homeLastFocus = null;
@@ -2819,7 +2851,7 @@ document.addEventListener("keydown", e => {
 });
 
 // PERSISTÊNCIA JSON / EXPORTAÇÃO SVG
-$("save").onclick = () => {
+on("save", "click", () => {
   if (!canEdit()) return showToast("Estudantes não podem salvar alterações", "info");
   const data = JSON.stringify({ version: 4, date: new Date().toISOString(), areas: state.areas, areaAtiva: state.areaAtiva }, null, 2);
   const blob = new Blob([data], { type: "application/json" });
@@ -2829,14 +2861,14 @@ $("save").onclick = () => {
   a.click();
   scheduleRoomSync();
   showToast("Arquivo JSON salvo com sucesso", "success");
-};
+});
 
-$("load").onclick = () => {
+on("load", "click", () => {
   if (!canEdit()) return showToast("Estudantes não podem carregar projetos", "info");
   const input = document.createElement("input");
   input.type = "file";
   input.accept = ".json";
-  input.onchange = e => {
+  input.addEventListener("change", e => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
@@ -2852,9 +2884,9 @@ $("load").onclick = () => {
       }
     };
     reader.readAsText(file);
-  };
+  });
   input.click();
-};
+});
 
 /**
  * Escapa texto para uso seguro dentro de atributos e nós SVG.
@@ -2965,7 +2997,7 @@ function exportSvgFile(exportAll) {
   showToast(exportAll?"Projeto exportado em SVG":"Área ativa exportada em SVG","success");
 }
 
-$("exportSvg").onclick = () => {
+on("exportSvg", "click", () => {
   if (state.areas.length <= 1) {
     exportSvgFile(false);
     return;
@@ -2975,7 +3007,7 @@ $("exportSvg").onclick = () => {
     () => exportSvgFile(true),
     {title:"Exportar SVG",confirmLabel:"Todas as áreas",cancelLabel:"Somente área ativa",onCancel:()=>exportSvgFile(false)}
   );
-};
+});
 
 // NAVEGAÇÃO DA INTERFACE
 $("homeBtn")?.addEventListener("click", () => showHomeScreen());
@@ -2997,22 +3029,22 @@ const btnShortcuts = $("btnShortcuts");
 const btnCloseShortcuts = $("btnCloseShortcuts");
 
 if (btnShortcuts && shortcutsModal) {
-  btnShortcuts.onclick = () => {
+  btnShortcuts.addEventListener("click", () => {
     shortcutsModal.classList.remove("hidden");
     btnCloseShortcuts?.focus();
-  };
+  });
 }
 
 if (btnCloseShortcuts && shortcutsModal) {
-  btnCloseShortcuts.onclick = () => { shortcutsModal.classList.add("hidden"); };
+  btnCloseShortcuts.addEventListener("click", () => { shortcutsModal.classList.add("hidden"); });
 }
 
 if (shortcutsModal) {
-  shortcutsModal.onclick = (e) => {
+  shortcutsModal.addEventListener("click", (e) => {
     if (e.target === shortcutsModal) {
       shortcutsModal.classList.add("hidden");
     }
-  };
+  });
 }
 
 // CONTROLES E ATALHOS DE TECLADO

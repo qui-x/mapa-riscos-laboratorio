@@ -17,7 +17,10 @@ mapa de riscos do laboratorio/
 │   ├── crypto.js
 │   ├── room-gas.js
 │   └── mapa.js
-
+├── gas/
+│   ├── Code.gs
+│   └── appsscript.json
+└── tests/
 ```
 
 ## Configuração do Google Apps Script
@@ -84,3 +87,13 @@ O `index.html` contém comentários nas regiões estruturais para explicar a res
 ## Planilha mestra
 
 No Google Apps Script, execute `setupMasterSpreadsheet()` uma vez. A função cria ou registra a planilha mestra e configura automaticamente as abas `usuarios`, `salas`, `sinalizacao` e `projetos`. O ID fica salvo em `Script Properties`, evitando manter o identificador da planilha como configuração obrigatória no restante do backend.
+
+## F37 — Correções de integração frontend
+
+- Eventos DOM migrados para `addEventListener` com helper `on()` para evitar falhas por elementos ausentes.
+- Path SVG de alerta corrigido para eliminar o erro `Expected number`.
+- Assets SVG de riscos e equipamentos incluídos em `assets/svg/`.
+- Auto-inicialização declarativa do Google Identity Services removida; o botão é renderizado somente após `google.accounts.id.initialize()` com callback definido.
+- Adicionado `tests/frontend-integrity-smoke.mjs`.
+
+Os valores reais de `GAS_URL` e `GOOGLE_CLIENT_ID` continuam a ser configurados pelo responsável pela publicação em `js/config.js`, pois dependem do projeto Google/GAS do ambiente.
