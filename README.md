@@ -17,10 +17,7 @@ mapa de riscos do laboratorio/
 │   ├── crypto.js
 │   ├── room-gas.js
 │   └── mapa.js
-├── gas/
-│   ├── Code.gs
-│   └── appsscript.json
-└── tests/
+
 ```
 
 ## Configuração do Google Apps Script
