@@ -188,8 +188,7 @@ async function handleGoogleSignIn(response) {
     console.log("Sessão criada:", Boolean(state.sessionToken));
     localStorage.setItem(USER_KEY, JSON.stringify(state.user));
     localStorage.setItem(SESSION_TOKEN_KEY, state.sessionToken);
-    applyAuthUI(); 
-    await loadUserRooms(); 
+    applyAuthUI(); await loadUserRooms(); showHomeScreen();
     showToast(`Login realizado como ${state.user.nome || state.user.email}`, "success");
   } catch (err) { setLoginError(err.message || "Falha no login Google."); }
   finally { setLoginLoading(false); }
@@ -331,32 +330,27 @@ function connectRoomSocket() {
  * Aplica ao editor os dados retornados pelo servidor ao entrar ou retomar uma sala.
  */
 async function enterRoomFromServer(sala, role) {
-  try {
-    console.log("ENTRANDO NA SALA - Início", { role, codigo: sala.codigo });
-    state.role = role === "professor" ? "professor" : "student";
-    state.roomCode = sala.codigo; 
-    state.roomToken = state.user?.id || sala.token || "";
-    persistRoomSession(); 
-    applySessionUI();
-    if (window.RoomBackend?.stopRealtime) window.RoomBackend.stopRealtime();
-    if (sala.projeto) {
-      const data = await (window.RoomBackend?.decryptRoomProject ? window.RoomBackend.decryptRoomProject(sala) : Promise.resolve(sala.projeto));
-      if (data?.areas) {
-        state.areas = normalizeModelAreas(data.areas);
-        state.areaAtiva = state.areas.find(a => a.id === data.areaAtiva)?.id || state.areas[0]?.id;
-        syncAreaConnections(); updateAreaUI();
-      }
-    } else if (!state.areas.length) {
-      const a = createArea(); state.areas=[a]; state.areaAtiva=a.id;
+  state.role = role === "professor" ? "professor" : "student";
+  state.roomCode = String(sala?.codigo || "").toUpperCase();
+  state.roomToken = state.user?.id || sala?.token || "";
+  console.log("3. Sessão da sala preparada:", { role: state.role, roomCode: state.roomCode, user: state.user });
+  if (!state.roomCode) throw new Error("O servidor não retornou o código da sala.");
+  if (!state.roomToken) throw new Error("Não foi possível identificar o usuário autenticado para a sala.");
+  persistRoomSession(); applySessionUI();
+  if (window.RoomBackend?.stopRealtime) window.RoomBackend.stopRealtime();
+  if (sala.projeto) {
+    const data = await (window.RoomBackend?.decryptRoomProject ? window.RoomBackend.decryptRoomProject(sala) : Promise.resolve(sala.projeto));
+    if (data?.areas) {
+      state.areas = normalizeModelAreas(data.areas);
+      state.areaAtiva = state.areas.find(a => a.id === data.areaAtiva)?.id || state.areas[0]?.id;
+      syncAreaConnections(); updateAreaUI();
     }
-    console.log("ANTES DE enterEditor");
-    enterEditor(); // Verifique se essa linha está sendo executada
-    console.log("DEPOIS DE enterEditor");
-    connectRoomSocket();
-    if (state.role === "student") showToast("Sala carregada em modo visualização", "info");
-  } catch (err) {
-    console.error("ERRO em enterRoomFromServer:", err);
+  } else if (!state.areas.length) {
+    const a = createArea(); state.areas=[a]; state.areaAtiva=a.id;
   }
+  enterEditor();
+  connectRoomSocket();
+  if (state.role === "student") showToast("Sala carregada em modo visualização", "info");
 }
 /**
  * Cria uma nova sala a partir da tela de login e entra como professor.
@@ -372,12 +366,7 @@ async function createRoomFromLogin() {
     if (!data?.sala?.codigo) throw new Error("O servidor não retornou uma sala válida.");
     await enterRoomFromServer(data.sala, "professor");
     console.log("4. Entrou no editor como professor:", { role: state.role, roomCode: state.roomCode, user: state.user });
-
-    // FORÇA a exibição do editor e esconde qualquer outra tela (Login/Home)
-    document.getElementById("loginScreen")?.classList.add("hidden");
-    document.getElementById("homeScreen")?.classList.add("hidden");
-    document.getElementById("app")?.classList.remove("hidden");
-
+    // Não retornar à Home após criar a sala: o fluxo correto é entrar diretamente no editor.
     showToast(`Sala criada. Código: ${data.sala.codigo}`, "success");
   } catch (err) {
     console.error("ERRO na criação da sala:", err);
@@ -413,22 +402,14 @@ function showLoginScreen() {
  */
 async function bootstrapRoomSession() {
   if (!isAuthenticated()) return false;
-  let session = null; 
-  try { session = JSON.parse(sessionStorage.getItem(ROOM_SESSION_KEY) || "null"); } catch {}
+  let session = null; try { session = JSON.parse(sessionStorage.getItem(ROOM_SESSION_KEY) || "null"); } catch {}
   if (!session?.codigo) return false;
-  console.log("Sessão de sala encontrada:", session);
   try {
     const data = await apiRequest(`/api/sala/status/${encodeURIComponent(session.codigo)}`);
     if (!data?.sala?.status) throw new Error("Sala indisponível");
     const join = await apiRequest("/api/sala/entrar", { method:"POST", body:JSON.stringify({codigo:session.codigo}) });
-    console.log("Join retornou papel:", join.sala.papel);
-    await enterRoomFromServer(join.sala, join.sala.papel); 
-    return true;
-  } catch { 
-    console.warn("Sessão de sala inválida, limpando...");
-    sessionStorage.removeItem(ROOM_SESSION_KEY); 
-    return false; 
-  }
+    await enterRoomFromServer(join.sala, join.sala.papel); return true;
+  } catch { sessionStorage.removeItem(ROOM_SESSION_KEY); return false; }
 }
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const snapVal = v => state.snap ? Math.round(v / 0.1) * 0.1 : v;
@@ -3177,6 +3158,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   const authenticated = await bootstrapUserSession();
   if (authenticated) {
     const restored = await bootstrapRoomSession();
+    if (!restored) showHomeScreen();
   } else { showLoginScreen(); }
 });
 
