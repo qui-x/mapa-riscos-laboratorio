@@ -1,4 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="23" fill="#ef444422" stroke="#ef4444" stroke-width="3"/>
-  <text x="32" y="37" text-anchor="middle" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#ef4444">EX</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <circle cx="50" cy="50" r="44" fill="#ef444422" stroke="#ef4444" stroke-width="3.5"/>
+  <rect x="40" y="38" width="20" height="35" rx="4" fill="#ef4444" opacity="0.85"/>
+  <path d="M38 73 h24" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+  <path d="M46 38 v-5 h8 v5" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M50 33 l8 -6" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+  <path d="M60 44 c6 0 8 6 4 12" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
 </svg>

@@ -1,4 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="24" fill="#9da8b533" stroke="#9da8b5" stroke-width="3"/>
-  <text x="32" y="37" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#9da8b5">ER</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <circle cx="50" cy="50" r="44" fill="#9da8b522" stroke="#9da8b5" stroke-width="3.5"/>
+  <rect x="35" y="60" width="30" height="24" rx="2" fill="none" stroke="#9da8b5" stroke-width="3.5"/>
+  <path d="M35 69 h30" stroke="#9da8b5" stroke-width="2"/>
+  <path d="M50 60 v9" stroke="#9da8b5" stroke-width="2"/>
+  <circle cx="40" cy="30" r="5.5" fill="#9da8b5"/>
+  <path d="M43 36 C40 45 42 53 48 60" fill="none" stroke="#9da8b5" stroke-width="5" stroke-linecap="round"/>
+  <path d="M43 40 L50 60" fill="none" stroke="#9da8b5" stroke-width="4" stroke-linecap="round"/>
+  <path d="M48 60 L32 68 L26 82" fill="none" stroke="#9da8b5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M60 35 C66 42 66 50 60 58" fill="none" stroke="#c8836f" stroke-width="3" stroke-linecap="round"/>
+  <path d="M57 37 L60 33 L63 37" fill="none" stroke="#c8836f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

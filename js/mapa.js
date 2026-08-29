@@ -168,14 +168,31 @@ function applyAuthUI() {
   if (!authenticated) { $("loginRoleProfessor")?.removeAttribute("disabled"); $("loginRoleStudent")?.removeAttribute("disabled"); }
 }
 /** Inicializa o Google Identity Services com o client ID configurado. */
+function isValidGoogleClientId(clientId) {
+  return /^[0-9]+-[a-z0-9-]+\.apps\.googleusercontent\.com$/i.test(String(clientId || "").trim());
+}
+function isConfiguredGasUrl(url) {
+  return /^https:\/\/script\.google\.com\/macros\/s\/[^\s/]+\/exec$/i.test(String(url || "").trim());
+}
+/** Inicializa o Google Identity Services somente quando a configuração local é válida. */
 function initializeGoogleIdentity() {
   const clientId = String(window.APP_CONFIG?.GOOGLE_CLIENT_ID || "").trim();
+  const gasUrl = String(window.APP_CONFIG?.GAS_URL || "").trim();
   const host = $("googleSignInButton");
   if (!host) return;
+  if (!isValidGoogleClientId(clientId)) {
+    host.innerHTML = '<span class="google-config-warning">Configure um Google Client ID OAuth para Web válido em js/config.js.</span>';
+    console.error("GIS não inicializado: GOOGLE_CLIENT_ID ausente ou inválido.");
+    return;
+  }
+  if (!isConfiguredGasUrl(gasUrl)) {
+    host.innerHTML = '<span class="google-config-warning">Configure a URL /exec do Google Apps Script em js/config.js.</span>';
+    console.error("Login não pode continuar: GAS_URL ausente ou inválida.");
+    return;
+  }
   let attempts = 0;
   const ready = () => {
     if (window.google?.accounts?.id) {
-      if (!clientId || clientId.includes("COLE_AQUI")) { host.innerHTML = '<span class="google-config-warning">Configure GOOGLE_CLIENT_ID em js/config.js.</span>'; return; }
       window.google.accounts.id.initialize({ client_id: clientId, callback: window.handleGoogleSignIn, auto_select: false });
       host.innerHTML = "";
       window.google.accounts.id.renderButton(host, { theme: "outline", size: "large", text: "signin_with", shape: "rectangular", width: 320 });

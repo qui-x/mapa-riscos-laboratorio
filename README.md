@@ -97,3 +97,25 @@ No Google Apps Script, execute `setupMasterSpreadsheet()` uma vez. A função cr
 - Adicionado `tests/frontend-integrity-smoke.mjs`.
 
 Os valores reais de `GAS_URL` e `GOOGLE_CLIENT_ID` continuam a ser configurados pelo responsável pela publicação em `js/config.js`, pois dependem do projeto Google/GAS do ambiente.
+
+
+## Configuração do Google Login
+
+Antes de publicar no GitHub Pages, edite `js/config.js` e informe os valores reais:
+
+```js
+window.APP_CONFIG = Object.freeze({
+  GAS_URL: 'https://script.google.com/macros/s/SEU_DEPLOYMENT_ID/exec',
+  GOOGLE_CLIENT_ID: 'SEU_CLIENT_ID.apps.googleusercontent.com'
+});
+```
+
+O `GOOGLE_CLIENT_ID` deve ser uma credencial OAuth 2.0 do tipo **Web application**. Para o GitHub Pages, registre a origem HTTPS do site em **Authorized JavaScript origins**. A origem deve ser o esquema + domínio; por exemplo, `https://seuusuario.github.io`. A documentação do Google exige que a origem JavaScript corresponda ao site que está iniciando o fluxo.
+
+Não publique valores fictícios como `COLE_AQUI...`: isso provoca `401 invalid_client`.
+
+## Configuração do frontend
+
+Os valores reais de `GAS_URL` e `GOOGLE_CLIENT_ID` já estão preenchidos em `js/config.js` nesta versão. Para publicar em outro ambiente, substitua-os pelos valores correspondentes.
+
+O `GOOGLE_CLIENT_ID` deve ser um cliente OAuth 2.0 do tipo Web e a origem do GitHub Pages deve estar autorizada no Google Cloud Console.
