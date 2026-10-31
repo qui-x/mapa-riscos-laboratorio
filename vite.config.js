@@ -7,9 +7,9 @@ import tailwindcss from "@tailwindcss/vite";
 const projectRoot = dirname(fileURLToPath(import.meta.url));
 
 /**
- * O editor ainda usa scripts clássicos com escopo global.
- * Eles são mantidos sem conversão para módulos até que cada parte
- * seja migrada e testada individualmente.
+ * The editor remains a classic script while its internal modules are
+ * preserved. Vite compiles the entry HTML and CSS; this plugin copies
+ * the existing runtime and SVG symbols without rewriting their globals.
  */
 function copyLegacyRuntime() {
   return {

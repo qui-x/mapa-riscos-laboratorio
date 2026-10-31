@@ -60,7 +60,7 @@ Possui 203 instrumentos de laboratório, modelos com peças separadas, articula�
 
 Repositório: https://github.com/stefangolas/LabwareModels
 
-Contém modelos de consumíveis científicos, incluindo tubos Eppendorf, placas de microtitulação e outros itens. Não foi localizada uma licença explícita no repositório consultado. Manter apenas como referência; não redistribuir até obter autorização ou licença clara.
+Contém modelos de consumíveis científicos, incluindo tubos Eppendorf, placas de microtitulação e outros itens. Não foi localizada uma licença explícita no repositório. Manter apenas como referência; não redistribuir até obter autorização ou licença clara.
 
 ## Padrão de integração do Mapa de Riscos
 

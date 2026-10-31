@@ -11,7 +11,8 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run build"
+    "check": "npm run typecheck && npm run test:smoke && npm run build",
+    "test:smoke": "node tests/no-login-smoke.mjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

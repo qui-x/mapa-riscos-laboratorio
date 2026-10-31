@@ -16,7 +16,7 @@ export interface Vector3Meters {
 
 /**
  * Converte comprimentos entre metros e pés.
- * A camada 3D usará metros internamente; fontes externas podem usar pés.
+ * O futuro editor 3D usará metros internamente; fontes externas podem usar pés.
  */
 export function convertLength(value: number, from: LengthUnit, to: LengthUnit): number {
   if (!Number.isFinite(value)) {
