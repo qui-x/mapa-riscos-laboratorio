@@ -427,3 +427,8 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Vite / Node build
+node_modules/
+dist/
+.vite/
