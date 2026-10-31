@@ -5,8 +5,9 @@
  * regras globais de formulário, botões e canvas que não devem ser zeradas
  * durante esta primeira etapa de modernização.
  */
-@layer theme, utilities;
+@layer theme, legacy, components, utilities;
 @import "tailwindcss/theme.css" layer(theme);
+@import "./mapa.css" layer(legacy);
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @source "../index.html";
@@ -26,6 +27,7 @@
   --color-lab-muted: #a9bac4;
 }
 
+@layer components {
 /* Identidade geral */
 :root {
   --bg: #081116;
@@ -744,4 +746,5 @@ label {
   .home-brand-mark { width: 46px; height: 46px; }
   .home-account-bar { flex-wrap: wrap; }
   .login-shell { padding: 18px; }
+}
 }
