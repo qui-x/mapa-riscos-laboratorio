@@ -126,3 +126,33 @@ Professores podem criar salas locais de 6 caracteres e estudantes podem entrar n
 A autenticação atual usa Google Apps Script + Google Sheets, sem Google Identity Services. O frontend usa `js/auth.js` para cadastro, login, logout, recuperação e redefinição de senha; `js/room-gas.js` faz a comunicação com o Web App. Execute `setupMasterSpreadsheet()` no GAS antes de publicar.
 
 A aba `usuarios` deve conter: `id`, `email`, `nome`, `foto`, `papel`, `senhaHash`, `senhaSalt`, `resetToken`, `resetExpira`, `criadoEm`, `ultimoAcesso`.
+
+
+## Modernização visual — Vite + Tailwind CSS
+
+A branch `redesign/tailwind-css-v1` introduz uma infraestrutura incremental com Vite, Tailwind CSS 4 e TypeScript. A versão legada continua carregando seus scripts clássicos em ordem, sem migração para módulos nesta etapa.
+
+### Requisitos
+
+- Node.js 20.19+ (ou versão compatível com Vite 8)
+- npm
+
+### Comandos
+
+```bash
+npm install
+npm run dev
+npm run typecheck
+npm run build
+npm run preview
+```
+
+O build produz arquivos estáticos em `dist/`. O Vite compila o CSS e o plugin local copia os diretórios `js/` e `assets/` usados pelo runtime atual.
+
+### Regras da migração
+
+- Não reescrever o Canvas 2D nem a geometria como parte da modernização visual.
+- Não remover IDs, atributos de acessibilidade, nomes de eventos ou contratos consumidos pelo JavaScript existente.
+- O Tailwind Preflight fica desativado intencionalmente nesta etapa para não redefinir globalmente controles legados.
+- Novos módulos TypeScript ficam isolados em `src/`; a migração será gradual e acompanhada de testes.
+- A pesquisa de modelos 3D e as condições de licenciamento estão registradas em `docs/3d-assets-roadmap.md`.
